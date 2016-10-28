@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Entity
 @Table(name = "users", schema = "public")
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class)
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator="users_id_user_seq")
@@ -33,7 +33,6 @@ public class User {
 
     @OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="user")
     private List<UserRole> rolesList;
-
 
     @Column(name = "is_active", nullable = false)
     private boolean active;
@@ -78,7 +77,7 @@ public class User {
         this.password = password;
     }
 
-    public List<UserRole> getRolesList() {
+    public List<UserRole> getRoles() {
         return rolesList;
     }
 
