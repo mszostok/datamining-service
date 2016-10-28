@@ -3,6 +3,7 @@ target/
 
 ### CUSTOM ###
 /scripts
+/logs
 
 ### STS ###
 .classpath

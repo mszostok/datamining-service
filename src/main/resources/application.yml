@@ -10,10 +10,23 @@ spring:
     url: jdbc:postgresql://192.168.99.100:5432/datamining
     username: postgres
     password: 123456
+  main:
+    banner-mode: 'off'
 
 ### JWT Token  ##
 security.jwt:
   tokenExpirationTime: 15 # Number of minutes
   refreshTokenExpTime: 60 # Minutes
-  tokenIssuer: http://svlada.com
-  tokenSigningKey: xm8EV6Hy5RMFK4EEACIDAwQus
+  tokenIssuer: http://datamining.com
+  tokenSigningKey: (YmJZmrj<ETLhFBj2>_JnU$Eft5k*&*e>M3^/?M'pD
+
+## PROFILE DEPS ##
+---
+spring:
+   profiles: prod
+logging.config: classpath:log4j2.prod.yml
+
+---
+spring:
+   profiles: dev
+logging.config: classpath:log4j2.dev.yml

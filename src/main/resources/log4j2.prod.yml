@@ -1,0 +1,41 @@
+Configutation:
+  name: LoggingProd
+
+  Properties:
+    Property:
+     - name: log-path
+       value: "logs"
+
+  Appenders:
+
+    File:
+      name: FileAppender
+      fileName: ${log-path}/error.log
+      JsonLayout:
+        complete: true
+        locationInfo: true
+
+    RollingFile:
+      - name: RollingFileAppender
+        fileName: ${log-path}/backend.log
+        filePattern: "logs/archive/backend.log.%d{yyyy-MM-dd-hh-mm}.gz"
+        JsonLayout:
+          complete: true
+          locationInfo: true
+        Policies:
+          SizeBasedTriggeringPolicy:
+            size: 1MB
+        DefaultRollOverStrategy:
+          max: 10
+
+  Loggers:
+
+      Logger:
+        - name: com.mszostok
+          additivity: false
+          level: debug
+          AppenderRef:
+            - ref: FileAppender
+              level: error
+            - ref: RollingFileAppender
+              level: ${env:LOG_LEVEL}
