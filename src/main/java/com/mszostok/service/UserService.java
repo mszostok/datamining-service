@@ -1,25 +1,22 @@
 package com.mszostok.service;
 
 
-
 import com.mszostok.domain.User;
 
 import java.util.Collection;
 import java.util.Optional;
 
-/**
- * @author mszostok
- */
+
 public interface UserService {
 
-    Collection<User> getAllActiveUsers();
+  Collection<User> getAllActiveUsers();
 
-    Optional<User> getActiveUserByEmail(String email);
+  Optional<User> getActiveUserByEmail(String email);
 
-    void deactivateById(int id);
+  void deactivateById(int id);
 
-    void activateById(int id);
+  void activateById(int id);
 
 
-    Collection<User> getAllUsers();
+  Collection<User> getAllUsers();
 }

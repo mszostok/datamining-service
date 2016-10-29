@@ -23,41 +23,40 @@ import java.util.Map;
 @Component
 public class AjaxAwareAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    @Autowired
-    private ObjectMapper mapper;
-    @Autowired
-    private JwtTokenFactory tokenFactory;
+  @Autowired
+  private ObjectMapper mapper;
+  @Autowired
+  private JwtTokenFactory tokenFactory;
 
-    @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
-        UserCtx userContext = (UserCtx) authentication.getPrincipal();
-        
-        JwtToken accessToken = tokenFactory.createAccessJwtToken(userContext);
-        JwtToken refreshToken = tokenFactory.createRefreshToken(userContext);
-        
-        Map<String, String> tokenMap = new HashMap<>();
-        tokenMap.put("token", accessToken.getToken());
-        tokenMap.put("refreshToken", refreshToken.getToken());
-        System.out.println("token: "+ accessToken.getToken());
-        response.setStatus(HttpStatus.OK.value());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        mapper.writeValue(response.getWriter(), tokenMap);
+  @Override
+  public void onAuthenticationSuccess(final HttpServletRequest request, final HttpServletResponse response,
+                                      final Authentication authentication) throws IOException, ServletException {
+    UserCtx userContext = (UserCtx) authentication.getPrincipal();
 
-        clearAuthenticationAttributes(request);
+    JwtToken accessToken = tokenFactory.createAccessJwtToken(userContext);
+    JwtToken refreshToken = tokenFactory.createRefreshToken(userContext);
+
+    Map<String, String> tokenMap = new HashMap<>();
+    tokenMap.put("token", accessToken.getToken());
+    tokenMap.put("refreshToken", refreshToken.getToken());
+    System.out.println("token: " + accessToken.getToken());
+    response.setStatus(HttpStatus.OK.value());
+    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+    mapper.writeValue(response.getWriter(), tokenMap);
+
+    clearAuthenticationAttributes(request);
+  }
+
+  /**
+   * Removes temporary authentication-related data which may have been stored
+   * in the session during the authentication process.
+   */
+  protected void clearAuthenticationAttributes(final HttpServletRequest request) {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      return;
     }
 
-    /**
-     * Removes temporary authentication-related data which may have been stored
-     * in the session during the authentication process..
-     * 
-     */
-    protected final void clearAuthenticationAttributes(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session == null) {
-            return;
-        }
-
-        session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
-    }
+    session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
+  }
 }

@@ -2,37 +2,25 @@ package com.mszostok.model;
 
 import org.springframework.http.HttpStatus;
 
-import java.util.Date;
+public final class ErrorResponse {
+  private final HttpStatus status;
 
+  private final String message;
 
-public class ErrorResponse {
-    // HTTP Response Status Code
-    private final HttpStatus status;
+  protected ErrorResponse(final String message, final HttpStatus status) {
+    this.message = message;
+    this.status = status;
+  }
 
-    // General Error message
-    private final String message;
+  public static ErrorResponse of(final String message, final HttpStatus status) {
+    return new ErrorResponse(message, status);
+  }
 
-    private final Date timestamp;
+  public Integer getStatus() {
+    return status.value();
+  }
 
-    protected ErrorResponse(final String message, HttpStatus status) {
-        this.message = message;
-        this.status = status;
-        this.timestamp = new Date();
-    }
-
-    public static ErrorResponse of(final String message, HttpStatus status) {
-        return new ErrorResponse(message, status);
-    }
-
-    public Integer getStatus() {
-        return status.value();
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
+  public String getMessage() {
+    return message;
+  }
 }

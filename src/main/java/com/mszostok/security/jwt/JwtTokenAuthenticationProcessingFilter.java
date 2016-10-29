@@ -1,7 +1,7 @@
 package com.mszostok.security.jwt;
 
-import com.mszostok.model.token.RawAccessJwtToken;
 import com.mszostok.configuration.SecurityConfig;
+import com.mszostok.model.token.RawAccessJwtToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -17,39 +17,39 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-public class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
-    @Autowired
-    private AuthenticationFailureHandler failureHandler;
-    @Autowired
-    private JwtHeaderTokenExtractor tokenHeaderExtractor;
+public final class JwtTokenAuthenticationProcessingFilter extends AbstractAuthenticationProcessingFilter {
+  @Autowired
+  private AuthenticationFailureHandler failureHandler;
+  @Autowired
+  private JwtHeaderTokenExtractor tokenHeaderExtractor;
 
-    public JwtTokenAuthenticationProcessingFilter(RequestMatcher requiresAuthenticationRequestMatcher) {
-        super(requiresAuthenticationRequestMatcher);
-    }
+  public JwtTokenAuthenticationProcessingFilter(final RequestMatcher requiresAuthenticationRequestMatcher) {
+    super(requiresAuthenticationRequestMatcher);
+  }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
-            throws AuthenticationException, IOException, ServletException {
-        String tokenPayload = request.getHeader(SecurityConfig.JWT_TOKEN_HEADER_PARAM);
-        RawAccessJwtToken token = new RawAccessJwtToken(tokenHeaderExtractor.extract(tokenPayload));
+  @Override
+  public Authentication attemptAuthentication(final HttpServletRequest request, final HttpServletResponse response)
+      throws AuthenticationException, IOException, ServletException {
+    String tokenPayload = request.getHeader(SecurityConfig.JWT_TOKEN_HEADER_PARAM);
+    RawAccessJwtToken token = new RawAccessJwtToken(tokenHeaderExtractor.extract(tokenPayload));
 
-        return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
-    }
+    return getAuthenticationManager().authenticate(new JwtAuthenticationToken(token));
+  }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-                                            Authentication authResult) throws IOException, ServletException {
-        System.out.println("susscceeess");
-        SecurityContext context = SecurityContextHolder.createEmptyContext();
-        context.setAuthentication(authResult);
-        SecurityContextHolder.setContext(context);
-        chain.doFilter(request, response);
-    }
+  @Override
+  protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain,
+                                          final Authentication authResult) throws IOException, ServletException {
+    SecurityContext context = SecurityContextHolder.createEmptyContext();
+    context.setAuthentication(authResult);
+    SecurityContextHolder.setContext(context);
 
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                              AuthenticationException failed) throws IOException, ServletException {
-        SecurityContextHolder.clearContext();
-        failureHandler.onAuthenticationFailure(request, response, failed);
-    }
+    chain.doFilter(request, response);
+  }
+
+  @Override
+  protected void unsuccessfulAuthentication(final HttpServletRequest request, final HttpServletResponse response,
+                                            final AuthenticationException failed) throws IOException, ServletException {
+    SecurityContextHolder.clearContext();
+    failureHandler.onAuthenticationFailure(request, response, failed);
+  }
 }

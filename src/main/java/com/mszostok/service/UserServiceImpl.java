@@ -10,45 +10,42 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 
-/**
- * @author mszostok
- */
 @Service("userService")
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
+  @Autowired
+  private UserRepository userRepository;
 
-    private void setActive(int id, boolean active){
-        User user = userRepository.findOneByIdUser(id);
+  private void setActive(final int id, final boolean active) {
+    User user = userRepository.findOneByIdUser(id);
 
-        user.setActive(active); //automatic update due to Transactional annotation
-    }
+    user.setActive(active); //automatic update due to Transactional annotation
+  }
 
-    @Override
-    public Collection<User> getAllActiveUsers() {
-        return userRepository.findByActiveTrue();
-    }
+  @Override
+  public Collection<User> getAllActiveUsers() {
+    return userRepository.findByActiveTrue();
+  }
 
-    @Override
-    public Optional<User> getActiveUserByEmail(String email) {
-        return userRepository.findOneByeMailAndActiveTrue(email);
-    }
+  @Override
+  public Optional<User> getActiveUserByEmail(final String email) {
+    return userRepository.findOneByEmailAndActiveTrue(email);
+  }
 
-    @Override
-    public void deactivateById(int id) {
-        setActive(id, false);
-    }
+  @Override
+  public void deactivateById(final int id) {
+    setActive(id, false);
+  }
 
-    @Override
-    public void activateById(int id) {
-        setActive(id, true);
-    }
+  @Override
+  public void activateById(final int id) {
+    setActive(id, true);
+  }
 
-    @Override
-    public Collection<User> getAllUsers() {
-        return userRepository.findAll();
-    }
+  @Override
+  public Collection<User> getAllUsers() {
+    return userRepository.findAll();
+  }
 
 }

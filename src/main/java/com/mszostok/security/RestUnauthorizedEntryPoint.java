@@ -11,10 +11,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class RestUnauthorizedEntryPoint implements AuthenticationEntryPoint {
-	@Override
-	public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException ex)
-			throws IOException, ServletException {
-		response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
-	}
+public final class RestUnauthorizedEntryPoint implements AuthenticationEntryPoint {
+  @Override
+  public void commence(final HttpServletRequest request, final HttpServletResponse response, final AuthenticationException ex)
+      throws IOException, ServletException {
+    response.sendError(HttpStatus.UNAUTHORIZED.value(), "Unauthorized");
+  }
 }

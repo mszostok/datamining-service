@@ -1,8 +1,7 @@
 package com.mszostok.security.ajax;
 
 import com.google.common.base.Strings;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -22,54 +21,51 @@ import java.io.IOException;
  * AjaxLoginProcessingFilter responsibility is to process Ajax authentication requests by
  * deserialization and basic validation data from incoming JSON payload.
  */
+@Slf4j
 public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingFilter {
-    private static Logger logger = LoggerFactory.getLogger(AjaxLoginProcessingFilter.class);
 
-    @Autowired
-    private AjaxAwareAuthenticationSuccessHandler successHandler;
-    @Autowired
-    private AjaxAwareAuthenticationFailureHandler failureHandler;
+  @Autowired
+  private AjaxAwareAuthenticationSuccessHandler successHandler;
+  @Autowired
+  private AjaxAwareAuthenticationFailureHandler failureHandler;
 
-    public AjaxLoginProcessingFilter(String defaultProcessUrl) {
-        super(defaultProcessUrl);
+  public AjaxLoginProcessingFilter(final String defaultProcessUrl) {
+    super(defaultProcessUrl);
+  }
+
+  @Override
+  public Authentication attemptAuthentication(final HttpServletRequest req, final HttpServletResponse resp)
+      throws AuthenticationException, IOException, ServletException {
+
+    if (!HttpMethod.POST.name().equals(req.getMethod())) {
+      if (log.isDebugEnabled()) {
+        log.debug("Authentication method not supported. Request method: " + req.getMethod());
+      }
+      throw new AuthenticationServiceException("Authentication method not supported");
     }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse resp)
-            throws AuthenticationException, IOException, ServletException {
+    String username = req.getParameter("username");
+    String password = req.getParameter("password");
 
-        if (!HttpMethod.POST.name().equals(req.getMethod())) {
-            if(logger.isDebugEnabled()) {
-                logger.debug("Authentication method not supported. Request method: " + req.getMethod());
-            }
-            throw new AuthenticationServiceException("Authentication method not supported");
-        }
-
-        String username = req.getParameter("username");
-        String password = req.getParameter("password");
-
-        System.out.println(username + " aa " + password);
-
-        if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
-            throw new AuthenticationServiceException("Username or Password not provided");
-        }
-
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(
-                username, password);
-
-        return this.getAuthenticationManager().authenticate(token);
+    if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
+      throw new AuthenticationServiceException("Username or Password not provided");
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-                                            Authentication authResult) throws IOException, ServletException {
-        successHandler.onAuthenticationSuccess(request, response, authResult);
-    }
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
 
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-                                              AuthenticationException failed) throws IOException, ServletException {
-        SecurityContextHolder.clearContext();
-        failureHandler.onAuthenticationFailure(request, response, failed);
-    }
+    return this.getAuthenticationManager().authenticate(token);
+  }
+
+  @Override
+  protected void successfulAuthentication(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain,
+                                          final Authentication authResult) throws IOException, ServletException {
+    successHandler.onAuthenticationSuccess(request, response, authResult);
+  }
+
+  @Override
+  protected void unsuccessfulAuthentication(final HttpServletRequest request, final HttpServletResponse response,
+                                            final AuthenticationException failed) throws IOException, ServletException {
+    SecurityContextHolder.clearContext();
+    failureHandler.onAuthenticationFailure(request, response, failed);
+  }
 }

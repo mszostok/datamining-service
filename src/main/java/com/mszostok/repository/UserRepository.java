@@ -6,14 +6,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Collection;
 import java.util.Optional;
 
-/**
- * @author mszostok
- */
 public interface UserRepository extends JpaRepository<User, Integer> {
 
-    Collection<User> findByActiveTrue();
+  Collection<User> findByActiveTrue();
 
-    Optional<User> findOneByeMailAndActiveTrue(String email);
+  Optional<User> findOneByEmailAndActiveTrue(String email);
 
-    User findOneByIdUser(Integer id);
+  User findOneByIdUser(Integer id);
 }

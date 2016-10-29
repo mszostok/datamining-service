@@ -11,18 +11,18 @@ import java.util.stream.Collectors;
 
 
 public class SkipPathRequestMatcher implements RequestMatcher {
-    private OrRequestMatcher matchers;
-    private RequestMatcher processingMatcher;
-    
-    public SkipPathRequestMatcher(List<String> pathsToSkip, String processingPath) {
-        Assert.notNull(pathsToSkip);
-        List<RequestMatcher> m = pathsToSkip.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList());
-        matchers = new OrRequestMatcher(m);
-        processingMatcher = new AntPathRequestMatcher(processingPath);
-    }
+  private OrRequestMatcher matchers;
+  private RequestMatcher processingMatcher;
 
-    @Override
-    public boolean matches(HttpServletRequest request) {
-        return !matchers.matches(request) && processingMatcher.matches(request);
-    }
+  public SkipPathRequestMatcher(final List<String> pathsToSkip, final String processingPath) {
+    Assert.notNull(pathsToSkip);
+    List<RequestMatcher> reqMatcher = pathsToSkip.stream().map(AntPathRequestMatcher::new).collect(Collectors.toList());
+    matchers = new OrRequestMatcher(reqMatcher);
+    processingMatcher = new AntPathRequestMatcher(processingPath);
+  }
+
+  @Override
+  public boolean matches(final HttpServletRequest request) {
+    return !matchers.matches(request) && processingMatcher.matches(request);
+  }
 }

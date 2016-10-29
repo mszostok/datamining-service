@@ -1,60 +1,24 @@
 package com.mszostok.configuration;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Jwt configuration class, all properties are configurable by env variables.
+ */
 @Configuration
 @ConfigurationProperties(prefix = "security.jwt")
+@Getter
+@Setter
 public class JwtConfig {
-    /**
-     * Expiration time for JwtToken.
-     */
-    private Integer tokenExpirationTime;
 
-    /**
-     * Token issuer.
-     */
-    private String tokenIssuer;
-    
-    /**
-     * Key is used to sign JwtToken.
-     */
-    private String tokenSigningKey;
-    
-    /**
-     * JwtToken can be refreshed during this timeframe.
-     */
-    private Integer refreshTokenExpTime;
-    
-    public Integer getRefreshTokenExpTime() {
-        return refreshTokenExpTime;
-    }
+  private Integer tokenExpirationTime;
 
-    public void setRefreshTokenExpTime(Integer refreshTokenExpTime) {
-        this.refreshTokenExpTime = refreshTokenExpTime;
-    }
+  private String tokenIssuer;
 
-    public Integer getTokenExpirationTime() {
-        return tokenExpirationTime;
-    }
-    
-    public void setTokenExpirationTime(Integer tokenExpirationTime) {
-        this.tokenExpirationTime = tokenExpirationTime;
-    }
-    
-    public String getTokenIssuer() {
-        return tokenIssuer;
-    }
+  private String tokenSigningKey;
 
-    public void setTokenIssuer(String tokenIssuer) {
-        this.tokenIssuer = tokenIssuer;
-    }
-    
-    public String getTokenSigningKey() {
-        return tokenSigningKey;
-    }
-    
-    public void setTokenSigningKey(String tokenSigningKey) {
-        this.tokenSigningKey = tokenSigningKey;
-    }
+  private Integer refreshTokenExpTime;
 }
