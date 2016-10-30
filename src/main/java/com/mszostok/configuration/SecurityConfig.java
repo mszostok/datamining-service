@@ -6,6 +6,7 @@ import com.mszostok.security.ajax.AjaxLoginProcessingFilter;
 import com.mszostok.security.jwt.JwtAuthenticationProvider;
 import com.mszostok.security.jwt.JwtTokenAuthenticationProcessingFilter;
 import com.mszostok.security.jwt.SkipPathRequestMatcher;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,15 +19,16 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
   public static final String JWT_TOKEN_HEADER_PARAM = "Authorization";
-  public static final String LOGIN_ENTRY_POINT = "/api/auth/login";
-  public static final String TOKEN_REFRESH_ENTRY_POINT = "/api/auth/token";
+  public static final String LOGIN_ENTRY_POINT = "/auth/login";
+  public static final String TOKEN_REFRESH_ENTRY_POINT = "/auth/token";
   public static final String TOKEN_BASED_AUTH_ENTRY_POINT = "/**";
 
   @Autowired
@@ -47,7 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() throws Exception {
-    List<String> pathsToSkip = Collections.singletonList(TOKEN_REFRESH_ENTRY_POINT);
+    List<String> pathsToSkip = Arrays.asList(TOKEN_REFRESH_ENTRY_POINT);
+    log.info("Path skipped from authorization: {}", pathsToSkip);
+
     SkipPathRequestMatcher matcher = new SkipPathRequestMatcher(pathsToSkip, TOKEN_BASED_AUTH_ENTRY_POINT);
     JwtTokenAuthenticationProcessingFilter filter = new JwtTokenAuthenticationProcessingFilter(matcher);
     filter.setAuthenticationManager(authenticationManager);
@@ -78,7 +82,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
       .authorizeRequests()
         .antMatchers(LOGIN_ENTRY_POINT).permitAll() // Login end-point
         .antMatchers(TOKEN_REFRESH_ENTRY_POINT).permitAll() // Token refresh end-point
-        .antMatchers("/games/").hasAuthority("ROLE_USER")
       .and()
         .addFilterBefore(buildAjaxLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(buildJwtTokenAuthenticationProcessingFilter(), UsernamePasswordAuthenticationFilter.class);

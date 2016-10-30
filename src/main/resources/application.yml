@@ -1,5 +1,11 @@
-### Database ##
+server:
+  context-path: /b1
+
 spring:
+  main:
+    banner-mode: 'off'
+
+  ### Database ##
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
@@ -7,26 +13,43 @@ spring:
 
   datasource:
     driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://192.168.99.100:5432/datamining
-    username: postgres
-    password: 123456
-  main:
-    banner-mode: 'off'
+    url: jdbc:postgresql://${DATABASE_HOST}:5432/${DATABASE_NAME}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
 
+  ## MAILING ###
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_SENDER_USERNAME}
+    password: ${MAIL_SENDER_PASSWORD}
+    protocol: smtp
+    properties.mail.smtp:
+      auth: true
+      starttls.enable: true
+      ssl.trust: smtp.gmail.com
+
+  messages:
+    basename: i18n/messages
+
+  thymeleaf:
+    check-template-location: true
+    mode: XHTML
+    cache: false
+    suffix: .html
+
+
+### Application specific  ###
 ### JWT Token  ##
 security.jwt:
   tokenExpirationTime: 15 # Number of minutes
   refreshTokenExpTime: 60 # Minutes
-  tokenIssuer: http://datamining.com
-  tokenSigningKey: (YmJZmrj<ETLhFBj2>_JnU$Eft5k*&*e>M3^/?M'pD
+  tokenIssuer: ${TOKEN_ISSUER}
+  tokenSigningKey: ${TOKEN_SIGNING_KEY}
 
-## PROFILE DEPS ##
----
-spring:
-   profiles: prod
-logging.config: classpath:log4j2.prod.yml
+app:
+  async:
+    corePoolSize: 3
+    maxPoolSize: 50
+    queueCapacity: 10000
 
----
-spring:
-   profiles: dev
-logging.config: classpath:log4j2.dev.yml

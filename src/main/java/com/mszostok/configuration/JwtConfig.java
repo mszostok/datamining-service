@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Jwt configuration class, all properties are configurable by env variables.
  */
-@Configuration
-@ConfigurationProperties(prefix = "security.jwt")
 @Getter
 @Setter
+@Configuration
+@ConfigurationProperties(prefix = "security.jwt")
 public class JwtConfig {
 
   private Integer tokenExpirationTime;
