@@ -17,18 +17,14 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
 @Slf4j
+@Component
 public final class JwtTokenFactory {
-  private final JwtConfig settings;
 
   @Autowired
-  public JwtTokenFactory(final JwtConfig settings) {
-    this.settings = settings;
-  }
+  private JwtConfig settings;
 
-  //TODO: return interface, refresh token in refresh ??
-  public AccessJwtToken createAccessJwtToken(final UserCtx userContext) {
+  public JwtToken createAccessToken(final UserCtx userContext) {
     if (Strings.isNullOrEmpty(userContext.getUsername())) {
       throw new IllegalArgumentException("Cannot create JWT Token without username");
     }

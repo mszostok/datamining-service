@@ -33,7 +33,7 @@ public class AjaxAwareAuthenticationSuccessHandler implements AuthenticationSucc
                                       final Authentication authentication) throws IOException, ServletException {
     UserCtx userContext = (UserCtx) authentication.getPrincipal();
 
-    JwtToken accessToken = tokenFactory.createAccessJwtToken(userContext);
+    JwtToken accessToken = tokenFactory.createAccessToken(userContext);
     JwtToken refreshToken = tokenFactory.createRefreshToken(userContext);
 
     Map<String, String> tokenMap = new HashMap<>();

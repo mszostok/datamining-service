@@ -1,0 +1,22 @@
+Configutation:
+  name: LoggingTest
+
+  Appenders:
+    Console:
+      name: ConsoleAppender
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: "%highlight{[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n}"
+
+  Loggers:
+      Root:
+        level: error
+        AppenderRef:
+          - ref: ConsoleAppender
+      Logger:
+        - name: com.mszostok
+          additivity: false
+          level: error
+          AppenderRef:
+            - ref: ConsoleAppender
+              level: error

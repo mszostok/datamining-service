@@ -1,0 +1,23 @@
+server:
+  context-path: /b1
+
+spring:
+  main:
+    banner-mode: 'off'
+
+  ## MAILING ###
+  mail:
+    host: localhost
+    port: 3333
+    username: test
+    password: test
+    protocol: smtp
+
+  messages:
+    basename: i18n/messages
+
+  thymeleaf:
+    check-template-location: true
+    mode: XHTML
+    cache: false
+    suffix: .html

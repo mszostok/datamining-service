@@ -59,7 +59,7 @@ public class AjaxAuthenticationProvider implements AuthenticationProvider {
         .map(authority -> new SimpleGrantedAuthority(authority.getRole()))
         .collect(Collectors.toList());
 
-    UserCtx userContext = UserCtx.create(user.getEmail(), authorities);
+    UserCtx userContext = new UserCtx(user.getEmail(), authorities);
 
     return new UsernamePasswordAuthenticationToken(userContext, null, userContext.getAuthorities());
   }

@@ -7,18 +7,20 @@ import org.springframework.context.MessageSource;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring4.SpringTemplateEngine;
 
 import javax.mail.internet.MimeMessage;
 import java.util.Locale;
+import java.util.concurrent.Future;
 
 /**
  * Service for sending e-mails.
  */
 @Slf4j
-@Service
+@Service("mailService")
 public class MailService {
 
   @Autowired
@@ -35,7 +37,7 @@ public class MailService {
                          final boolean isHtml) {
     if (log.isDebugEnabled()) {
       log.debug("Send e-mail[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart, isHtml, to, subject, content);
+          isMultipart, isHtml, to, subject, content);
     }
 
     // Prepare message using a Spring helper
@@ -54,10 +56,10 @@ public class MailService {
   }
 
   @Async
-  public void sendActivationEmail(final User user, final String baseUrl) {
+  public Future<String> sendActivationEmail(final User user, final String baseUrl) {
     log.info("Sending activation e-mail to '{}'", user.getEmail());
 
-    Locale locale =  Locale.US;
+    Locale locale = Locale.US;
     Context context = new Context(locale);
     context.setVariable("user", user);
     context.setVariable("baseUrl", baseUrl);
@@ -65,5 +67,6 @@ public class MailService {
     String subject = messageSource.getMessage("email.activation.title", null, locale);
 
     sendEmail(user.getEmail(), subject, content, false, true);
+    return new AsyncResult<>("email_sent");
   }
 }
