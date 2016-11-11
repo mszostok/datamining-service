@@ -30,8 +30,11 @@ public final class User {
   @Id
   @GeneratedValue(strategy = SEQUENCE, generator = "users_id_user_seq")
   @SequenceGenerator(name = "users_id_user_seq", sequenceName = "users_id_user_seq", allocationSize = 1)
-  @Column(name = "id_user", nullable = false)
+  @Column(name = "id_user", nullable = false, unique = true)
   private Integer idUser;
+
+  @Column(name = "username", nullable = false)
+  private String username;
 
   @Column(name = "first_name", nullable = false)
   private String firstName;
@@ -39,11 +42,21 @@ public final class User {
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
-  @Column(name = "e_mail", nullable = false, unique = true)
+  @Column(name = "email", nullable = false, unique = true)
   private String email;
 
   @Column(name = "password", nullable = false)
   private String password;
+
+  @Column(name = "city", nullable = false)
+  private String city;
+
+  @Column(name = "country", nullable = false)
+  private String country;
+
+
+  @Column(name = "postal_code", nullable = false)
+  private String postalCode;
 
   @OneToMany(fetch = EAGER, cascade = ALL, mappedBy = "user")
   @JsonManagedReference
@@ -61,6 +74,7 @@ public final class User {
 
     if (active != user.active) return false;
     if (idUser != null ? !idUser.equals(user.idUser) : user.idUser != null) return false;
+    if (username != null ? !username.equals(user.username) : user.username != null) return false;
     if (firstName != null ? !firstName.equals(user.firstName) : user.firstName != null) return false;
     if (lastName != null ? !lastName.equals(user.lastName) : user.lastName != null) return false;
     if (email != null ? !email.equals(user.email) : user.email != null) return false;
@@ -72,6 +86,7 @@ public final class User {
   @Override
   public int hashCode() {
     int result = idUser != null ? idUser.hashCode() : 0;
+    result = 31 * result + (username != null ? username.hashCode() : 0);
     result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
     result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
     result = 31 * result + (email != null ? email.hashCode() : 0);
@@ -85,6 +100,7 @@ public final class User {
   public String toString() {
     return MoreObjects.toStringHelper(this)
       .add("idUser", idUser)
+      .add("username", username)
       .add("firstName", firstName)
       .add("lastName", lastName)
       .add("email", email)

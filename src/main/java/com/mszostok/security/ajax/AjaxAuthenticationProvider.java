@@ -3,6 +3,7 @@ package com.mszostok.security.ajax;
 import com.mszostok.domain.User;
 import com.mszostok.model.UserCtx;
 import com.mszostok.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -27,26 +28,21 @@ import java.util.stream.Collectors;
  * Upon successful authentication delegate creation of JWT Token to AjaxAwareAuthenticationSuccessHandler
  */
 @Component
+@Slf4j
 public class AjaxAuthenticationProvider implements AuthenticationProvider {
-  //TODO: autowire in my onw
-  private final BCryptPasswordEncoder encoder;
-  private final UserService userService;
-
   @Autowired
-  public AjaxAuthenticationProvider(final UserService userService, final BCryptPasswordEncoder encoder) {
-    this.userService = userService;
-    this.encoder = encoder;
-  }
+  private BCryptPasswordEncoder encoder;
+  @Autowired
+  private UserService userService;
 
   @Override
   public Authentication authenticate(final Authentication authentication) throws AuthenticationException {
     Assert.notNull(authentication, "No authentication data provided");
 
-    String username = (String) authentication.getPrincipal();
+    String email = (String) authentication.getPrincipal();
     String password = (String) authentication.getCredentials();
 
-    //TODO: username -> email
-    User user = userService.getActiveUserByEmail(username).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    User user = userService.getActiveUserByEmail(email).orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
     if (!encoder.matches(password, user.getPassword())) {
       throw new BadCredentialsException("Authentication Failed. Wrong credentials was provided.");
     }

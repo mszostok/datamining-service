@@ -8,11 +8,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
-@RequestMapping("/")
 public final class RootResource {
 
   @Autowired
@@ -20,7 +20,7 @@ public final class RootResource {
   @Autowired
   private MailService mailService;
 
-  @RequestMapping(value = "/dashboard", produces = "application/json")
+  @RequestMapping(value = "/dashboard", produces = "application/json", method = RequestMethod.GET)
   public ResponseEntity<String> bar() {
     final HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.setContentType(MediaType.APPLICATION_JSON);

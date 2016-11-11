@@ -1,5 +1,6 @@
 server:
-  context-path: /b1
+  context-path: /api
+  port: 8081
 
 spring:
   main:

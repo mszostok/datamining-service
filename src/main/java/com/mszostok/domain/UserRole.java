@@ -23,7 +23,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Table(name = "user_roles", schema = "public")
 @Getter
 @Setter
-public final class UserRole {
+public class UserRole {
 
   @Id
   @GeneratedValue(strategy = SEQUENCE, generator = "user_roles_id_user_role_seq")
@@ -38,6 +38,14 @@ public final class UserRole {
   @JoinColumn(name = "users_id_user")
   @JsonBackReference
   private User user;
+
+  public UserRole() {
+  }
+
+  public UserRole(final String role, final User user) {
+    this.role = role;
+    this.user = user;
+  }
 
   @Override
   public boolean equals(final Object obj) {
