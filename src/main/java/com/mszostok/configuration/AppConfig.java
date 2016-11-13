@@ -12,6 +12,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "app")
 public class AppConfig {
   private final Async async = new Async();
+  private final Storage storage = new Storage();
+
+  @Getter
+  @Setter
+  @ToString
+  public static class Storage {
+    private String uploadLocation;
+  }
 
   @Getter
   @Setter

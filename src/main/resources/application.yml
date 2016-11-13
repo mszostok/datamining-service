@@ -38,6 +38,11 @@ spring:
     mode: XHTML
     cache: false
     suffix: .html
+  ## Upload file ##
+  http:
+    multipart:
+      max-file-size: 512KB
+      maxRequestSize: 512KB
 
 
 ### Application specific  ###
@@ -53,4 +58,5 @@ app:
     corePoolSize: 3
     maxPoolSize: 50
     queueCapacity: 10000
-
+  storage:
+    uploadLocation: "./tmp/uploads"

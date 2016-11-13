@@ -10,17 +10,15 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Collections;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
 @RestController
 public class AccountResource {
@@ -34,9 +32,8 @@ public class AccountResource {
   @Autowired
   private MailService mailService;
 
-
-  @RequestMapping(value = "/register", method = POST, produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE})
-  public ResponseEntity<?> registerAccount(@Valid @RequestBody final UserDto userDto, final HttpServletRequest request) {
+  @PostMapping(value = "/register", produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE})
+  public ResponseEntity<?> registerAccount(@Valid @RequestBody final UserDto userDto) {
 
     HttpHeaders jsonHeaders = new HttpHeaders();
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
