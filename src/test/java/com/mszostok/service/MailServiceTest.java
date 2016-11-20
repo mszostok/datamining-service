@@ -43,7 +43,7 @@ public class MailServiceTest {
     // given
     User user = new User();
     user.setEmail("receiver@there.com");
-    user.setFirstName("firstName");
+    user.setUsername("username");
 
     try (SimpleSmtpServer dumbster = SimpleSmtpServer.start(SERVER_PORT)) {
 
@@ -67,7 +67,7 @@ public class MailServiceTest {
 
       SmtpMessage email = emails.get(0);
       assertThat(email.getHeaderValue("Subject")).isEqualTo("Account activation");
-      assertThat(email.getBody()).contains("Dear firstName", "Thank you for registering. ");
+      assertThat(email.getBody()).contains("Dear username", "Thank you for registering. ");
       assertThat(email.getHeaderValue("To")).isEqualTo("receiver@there.com");
       assertThat(email.getHeaderValue("To")).isEqualTo("receiver@there.com");
     }

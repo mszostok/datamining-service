@@ -21,6 +21,10 @@ public class JwtHeaderTokenExtractor {
       throw new AuthenticationServiceException("Invalid authorization header size.");
     }
 
+    if (!header.startsWith(HEADER_PREFIX)) {
+      throw new AuthenticationServiceException("Invalid authorization header type, please prefix token with 'Bearer '.");
+    }
+
     return header.substring(HEADER_PREFIX.length(), header.length());
   }
 }

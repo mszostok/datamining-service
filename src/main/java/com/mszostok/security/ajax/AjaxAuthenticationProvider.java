@@ -16,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
@@ -27,8 +28,9 @@ import java.util.stream.Collectors;
  * Create UserCtx and populate it with username and user privileges
  * Upon successful authentication delegate creation of JWT Token to AjaxAwareAuthenticationSuccessHandler
  */
-@Component
 @Slf4j
+@Component
+@Transactional(readOnly = true)
 public class AjaxAuthenticationProvider implements AuthenticationProvider {
   @Autowired
   private BCryptPasswordEncoder encoder;
