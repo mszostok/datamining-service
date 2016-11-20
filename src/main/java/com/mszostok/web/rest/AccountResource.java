@@ -22,7 +22,7 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @RestController
 public class AccountResource {
-
+  //TODO: remove repository
   @Autowired
   private UserRepository userRepository;
 
@@ -39,10 +39,10 @@ public class AccountResource {
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
 
     return userRepository.findOneByEmail(userDto.getEmail().toLowerCase())
-      .map(user -> new ResponseEntity<>(Collections.singletonMap("message", "E-mail address already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
+      .map(user -> new ResponseEntity<>(Collections.singletonMap("error", "E-mail address already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
       .orElseGet(() ->
         userRepository.findOneByUsername(userDto.getUsername())
-          .map(user -> new ResponseEntity<>(Collections.singletonMap("message", "Username already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
+          .map(user -> new ResponseEntity<>(Collections.singletonMap("error", "Username already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
           .orElseGet(() -> {
             User user = userService.createSimpleUser(userDto);
             //TODO:

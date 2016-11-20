@@ -24,6 +24,7 @@ public final class RootResource {
   public ResponseEntity<String> bar() {
     final HttpHeaders httpHeaders = new HttpHeaders();
     httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+
     return new ResponseEntity<>("{\"message\": \"Welcome in dashboard \"}", httpHeaders, HttpStatus.OK);
   }
 }

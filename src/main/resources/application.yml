@@ -10,8 +10,9 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
-    properties.format_sql: true
-
+    properties:
+      format_sql: true
+      jadira.usertype.autoRegisterUserTypes: true
   datasource:
     driverClassName: org.postgresql.Driver
     url: jdbc:postgresql://${DATABASE_HOST}:5432/${DATABASE_NAME}
@@ -59,4 +60,4 @@ app:
     maxPoolSize: 50
     queueCapacity: 10000
   storage:
-    uploadLocation: "./tmp/uploads"
+    uploadLocation: ${UPLOAD_LOCATION}

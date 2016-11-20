@@ -48,6 +48,14 @@ public class UserService {
     return userRepository.findOneByEmailAndActiveTrue(email);
   }
 
+  @Transactional(readOnly = true)
+  public User getCurrentLoggedUser() {
+    return SecurityUtils.getCurrentUserLogin().map(email ->
+      getActiveUserByEmail(email)
+        .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email))
+    ).orElseThrow(() -> new IllegalStateException("Cannot get logged user"));
+  }
+
   public void deactivateById(final int id) {
     setActive(id, false);
   }
@@ -75,7 +83,6 @@ public class UserService {
     userRepository.save(user);
     userRoleRepository.save(userRole);
 
-    log.debug("Created Information for User: {}", user);
     return user;
   }
 

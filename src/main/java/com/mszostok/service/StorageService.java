@@ -1,6 +1,5 @@
 package com.mszostok.service;
 
-import com.mszostok.exception.StorageException;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,15 +9,15 @@ import java.util.stream.Stream;
 public interface StorageService {
   void init();
 
-  void store(MultipartFile file) throws StorageException;
-
   Stream<Path> loadAll();
-
-  Path load(String filename);
-
-  Resource loadAsResource(String filename);
 
   void deleteAll();
 
+  void storeTestingFile(MultipartFile file, Integer competitionId);
 
+  void storeTrainingFile(MultipartFile file, Integer competitionId);
+
+  Resource loadTrainingFileAsResource(Integer id);
+
+  Resource loadTestingFileAsResource(Integer id);
 }
