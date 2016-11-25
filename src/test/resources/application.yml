@@ -21,3 +21,7 @@ spring:
     mode: XHTML
     cache: false
     suffix: .html
+
+app:
+  storage:
+    uploadLocation: "./tmp/test/uploads"
