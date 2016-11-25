@@ -3,4 +3,4 @@
 <img src="http://engineer.recruit-lifestyle.co.jp/techblog/2015-10-02-spring-3mins/img/article_main.png" width="48">
 
 
-## Data mining competition web services
+## Data mining competition web services [![Build Status](https://travis-ci.com/mszostok/inz-backend.svg?token=ccfxHqCjsJPxse56s5pp&branch=develop)](https://travis-ci.com/mszostok/inz-backend)
