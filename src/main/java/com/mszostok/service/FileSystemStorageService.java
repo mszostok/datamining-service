@@ -1,5 +1,6 @@
 package com.mszostok.service;
 
+import com.google.common.base.Charsets;
 import com.mszostok.configuration.AppConfig;
 import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.StorageException;
@@ -15,9 +16,11 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,9 +46,9 @@ public class FileSystemStorageService implements StorageService {
 
   private Function<YearMonth, String> getPathFromYearMonth = yearMonth -> {
     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                                      .parseCaseInsensitive()
-                                      .appendPattern("/yyyy/MM/")
-                                      .toFormatter(Locale.ENGLISH);
+      .parseCaseInsensitive()
+      .appendPattern("/yyyy/MM/")
+      .toFormatter(Locale.ENGLISH);
     return yearMonth.format(formatter);
   };
 
@@ -128,17 +131,19 @@ public class FileSystemStorageService implements StorageService {
       String testingFileUUID = UUID.randomUUID().toString();
       String keyFileUUID = UUID.randomUUID().toString();
 
-      CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()), CSV_SEPARATOR);
-      CSVWriter keyCSVFile = new CSVWriter(new FileWriter(dirKeyName.resolve(keyFileUUID).toFile()), CSV_SEPARATOR);
-      CSVWriter testingCVSFile = new CSVWriter(new FileWriter(dirTestingName.resolve(testingFileUUID).toFile()), CSV_SEPARATOR);
+      CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
+      Writer keyWriter = new OutputStreamWriter(new FileOutputStream(dirKeyName.resolve(keyFileUUID).toFile()), Charsets.UTF_8);
+      Writer testingWriter = new OutputStreamWriter(new FileOutputStream(dirTestingName.resolve(testingFileUUID).toFile()), Charsets.UTF_8);
+      CSVWriter keyCSVWriter = new CSVWriter(keyWriter, CSV_SEPARATOR);
+      CSVWriter testingCVSWriter = new CSVWriter(testingWriter, CSV_SEPARATOR);
 
       reader.forEach(line -> {
-        testingCVSFile.writeNext(Arrays.copyOfRange(line, 1, line.length));
-        keyCSVFile.writeNext(Arrays.copyOfRange(line, 0, 1));
+        testingCVSWriter.writeNext(Arrays.copyOfRange(line, 1, line.length));
+        keyCSVWriter.writeNext(Arrays.copyOfRange(line, 0, 1));
       });
 
-      testingCVSFile.close();
-      keyCSVFile.close();
+      testingCVSWriter.close();
+      keyCSVWriter.close();
 
       uploadService.save(competitionId, file.getOriginalFilename(), FileLogicType.KEY, rootLocation.relativize(dirKeyName) + "/" + keyFileUUID);
       uploadService.save(competitionId, file.getOriginalFilename(), FileLogicType.TESTING, rootLocation.relativize(dirTestingName) + "/" + testingFileUUID);

@@ -1,5 +1,6 @@
 package com.mszostok.service;
 
+import com.google.common.base.Charsets;
 import com.mszostok.domain.Competition;
 import com.mszostok.domain.Description;
 import com.mszostok.domain.Participation;
@@ -115,8 +116,8 @@ public class CompetitionService {
     try {
       Resource keyFile = storageService.loadFileAsResource(competitionId, FileLogicType.KEY);
 
-      CSVReader submissionCSVFile = new CSVReader(new InputStreamReader(file.getInputStream()), CSV_SEPARATOR);
-      CSVReader keyCSVFile = new CSVReader(new InputStreamReader(keyFile.getInputStream()), CSV_SEPARATOR);
+      CSVReader submissionCSVFile = new CSVReader(new InputStreamReader(file.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
+      CSVReader keyCSVFile = new CSVReader(new InputStreamReader(keyFile.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
 
       List<String[]> keyList = keyCSVFile.readAll();
       List<String[]> submissionList = submissionCSVFile.readAll();
@@ -128,9 +129,9 @@ public class CompetitionService {
       }
 
       Double actualScore = scoreFor()
-        .submission(submissionList)
-        .and().key(keyList)
-        .withMetric("checkAll");
+                          .submission(submissionList)
+                          .and().key(keyList)
+                          .withMetric("checkAll");
       participationService.saveParticipation(userService.getCurrentLoggedUser(), competitionId, actualScore);
     } catch (IOException ex) {
       log.error("while processing submission with file: {} for competition: {}, :", file.getOriginalFilename(), competitionId, ex);
