@@ -51,8 +51,7 @@ public class UserService {
   @Transactional(readOnly = true)
   public User getCurrentLoggedUser() {
     return SecurityUtils.getCurrentUserLogin().map(email ->
-      getActiveUserByEmail(email)
-        .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email))
+      getActiveUserByEmail(email).<UsernameNotFoundException>orElseThrow(() -> new UsernameNotFoundException("User not found: " + email))
     ).orElseThrow(() -> new IllegalStateException("Cannot get logged user"));
   }
 
