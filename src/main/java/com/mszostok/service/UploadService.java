@@ -1,6 +1,8 @@
 package com.mszostok.service;
 
+import com.mszostok.domain.Competition;
 import com.mszostok.domain.Upload;
+import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.CompetitionException;
 import com.mszostok.repository.UploadRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,25 +23,24 @@ public class UploadService {
   @Autowired
   private CompetitionService competitionService;
 
-  public Upload save(final Integer competitionId, final String filename, final String logicType,
+  public Upload save(final Integer competitionId, final String filename, final FileLogicType type,
                      final String refLink) throws CompetitionException {
-    return competitionService.getCompetition(competitionId)
-      .map(competition -> {
-        if (!competition.getUser().equals(userService.getCurrentLoggedUser())) {
-          throw new CompetitionException("Logged user is not owner of competition: " + competition.getName());
-        }
-        Upload upload = new Upload();
+    Competition competition = competitionService.getCompetition(competitionId);
 
-        upload.setCompetition(competition);
-        upload.setOriginalFileName(filename);
-        upload.setLogicType(logicType);
-        upload.setRefLink(refLink);
+    if (!competition.getUser().equals(userService.getCurrentLoggedUser())) {
+      throw new CompetitionException("Logged user is not owner of competition: " + competition.getName());
+    }
+    Upload upload = new Upload();
 
-        return uploadRepository.save(upload);
-      }).orElseThrow(() -> new CompetitionException("Could not find competition with id: " + competitionId));
+    upload.setCompetition(competition);
+    upload.setOriginalFileName(filename);
+    upload.setLogicType(type.getName());
+    upload.setRefLink(refLink);
+
+    return uploadRepository.save(upload);
   }
 
-  public Optional<Upload> getByCompetitionIdAndType(final Integer id, final String type) {
-    return uploadRepository.findByCompetition_IdCompetitionAndLogicType(id, type);
+  public Optional<Upload> getByCompetitionIdAndType(final Integer id, final FileLogicType type) {
+    return uploadRepository.findByCompetition_IdCompetitionAndLogicType(id, type.getName());
   }
 }

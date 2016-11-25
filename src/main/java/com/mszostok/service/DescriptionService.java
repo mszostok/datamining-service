@@ -4,7 +4,6 @@ import com.mszostok.domain.Description;
 import com.mszostok.exception.DescriptionException;
 import com.mszostok.repository.DescriptionRepository;
 import com.mszostok.web.dto.CompetitionDto;
-import javassist.runtime.Desc;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

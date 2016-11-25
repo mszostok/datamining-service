@@ -1,6 +1,6 @@
 package com.mszostok.exception;
 
-public class DescriptionException extends RuntimeException{
+public class DescriptionException extends RuntimeException {
   public DescriptionException(final String message) {
     super(message);
   }
@@ -9,4 +9,3 @@ public class DescriptionException extends RuntimeException{
     super(message, cause);
   }
 }
-

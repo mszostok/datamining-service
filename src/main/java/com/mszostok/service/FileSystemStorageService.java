@@ -1,9 +1,11 @@
 package com.mszostok.service;
 
 import com.mszostok.configuration.AppConfig;
-import com.mszostok.exception.CompetitionException;
+import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.StorageException;
 import com.mszostok.exception.UploadException;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -13,7 +15,9 @@ import org.springframework.util.FileSystemUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.PostConstruct;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,6 +25,7 @@ import java.nio.file.Paths;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Arrays;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Function;
@@ -29,6 +34,7 @@ import java.util.stream.Stream;
 @Slf4j
 @Service("fileSystemStorageService")
 public class FileSystemStorageService implements StorageService {
+  public static final char CSV_SEPARATOR = ',';
 
   private final Path rootLocation;
 
@@ -37,9 +43,9 @@ public class FileSystemStorageService implements StorageService {
 
   private Function<YearMonth, String> getPathFromYearMonth = yearMonth -> {
     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-      .parseCaseInsensitive()
-      .appendPattern("/yyyy/MM/")
-      .toFormatter(Locale.ENGLISH);
+                                      .parseCaseInsensitive()
+                                      .appendPattern("/yyyy/MM/")
+                                      .toFormatter(Locale.ENGLISH);
     return yearMonth.format(formatter);
   };
 
@@ -59,8 +65,8 @@ public class FileSystemStorageService implements StorageService {
     }
   }
 
-  private Path createPath(final String... values) throws IOException {
-    StringBuffer subPath = new StringBuffer();
+  private Path createPathFor(final String... values) throws IOException {
+    StringBuilder subPath = new StringBuilder();
     for (final String s : values) {
       subPath.append(s).append("/");
     }
@@ -71,26 +77,6 @@ public class FileSystemStorageService implements StorageService {
     }
 
     return dirName;
-  }
-
-  private void store(final String type, final MultipartFile file, final Integer competitionId) throws StorageException {
-    try {
-      if (file.isEmpty()) {
-        log.info("Was uploaded empty file {}", file.getOriginalFilename());
-        throw new StorageException("Empty file " + file.getOriginalFilename());
-      }
-
-      Path dirName = createPath(type);
-      String uuidFilename = UUID.randomUUID().toString();
-
-      uploadService.save(competitionId, file.getOriginalFilename(), type, rootLocation.relativize(dirName) + "/" + uuidFilename);
-
-      Files.copy(file.getInputStream(), dirName.resolve(uuidFilename));
-
-    } catch (IOException ex) {
-      log.error("While storing file: {}", ex);
-      throw new StorageException("While storing file " + file.getOriginalFilename(), ex);
-    }
   }
 
   @Override
@@ -131,25 +117,86 @@ public class FileSystemStorageService implements StorageService {
 
   @Override
   public void storeTestingFile(final MultipartFile file, final Integer competitionId) {
-    store("testing", file, competitionId);
+    try {
+      if (file.isEmpty()) {
+        log.info("Was uploaded empty file {}", file.getOriginalFilename());
+        throw new StorageException("Empty file " + file.getOriginalFilename());
+      }
+
+      Path dirTestingName = createPathFor(FileLogicType.TESTING.getName());
+      Path dirKeyName = createPathFor(FileLogicType.KEY.getName());
+      String testingFileUUID = UUID.randomUUID().toString();
+      String keyFileUUID = UUID.randomUUID().toString();
+
+      CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()), CSV_SEPARATOR);
+      CSVWriter keyCSVFile = new CSVWriter(new FileWriter(dirKeyName.resolve(keyFileUUID).toFile()), CSV_SEPARATOR);
+      CSVWriter testingCVSFile = new CSVWriter(new FileWriter(dirTestingName.resolve(testingFileUUID).toFile()), CSV_SEPARATOR);
+
+      reader.forEach(line -> {
+        testingCVSFile.writeNext(Arrays.copyOfRange(line, 1, line.length));
+        keyCSVFile.writeNext(Arrays.copyOfRange(line, 0, 1));
+      });
+
+      testingCVSFile.close();
+      keyCSVFile.close();
+
+      uploadService.save(competitionId, file.getOriginalFilename(), FileLogicType.KEY, rootLocation.relativize(dirKeyName) + "/" + keyFileUUID);
+      uploadService.save(competitionId, file.getOriginalFilename(), FileLogicType.TESTING, rootLocation.relativize(dirTestingName) + "/" + testingFileUUID);
+    } catch (IOException ex) {
+      log.error("While storing file: {}", ex);
+      throw new StorageException("While storing file " + file.getOriginalFilename(), ex);
+    }
   }
 
   @Override
   public void storeTrainingFile(final MultipartFile file, final Integer competitionId) {
-    store("training", file, competitionId);
+    try {
+      if (file.isEmpty()) {
+        log.info("Was uploaded empty file {}", file.getOriginalFilename());
+        throw new StorageException("Empty file " + file.getOriginalFilename());
+      }
+
+      Path dirName = createPathFor("training");
+      String trainingFileUUID = UUID.randomUUID().toString();
+
+      Files.copy(file.getInputStream(), dirName.resolve(trainingFileUUID));
+
+      uploadService.save(competitionId, file.getOriginalFilename(), FileLogicType.TRAINING, rootLocation.relativize(dirName) + "/" + trainingFileUUID);
+    } catch (IOException ex) {
+      log.error("While storing file: {}", ex);
+      throw new StorageException("While storing file " + file.getOriginalFilename(), ex);
+    }
   }
+  //
+  //  @Override
+
+  //  public Resource loadTrainingFileAsResource(final Integer competitionId) {
+  //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TRAINING)
+  //      .map(upload -> loadAsResource(upload.getRefLink()))
+  //      .orElseThrow(() -> {
+  //        log.warn("Could not find trainig file for competition submission id: {} ", competitionId);
+  //        return new UploadException("Could not find testing file for competition");
+  //      });
+  //  }
+  //
+  //  @Override
+  //  public Resource loadTestingFileAsResource(final Integer competitionId) {
+  //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TESTING)
+  //      .map(upload -> loadAsResource(upload.getRefLink()))
+  //      .orElseThrow(() -> {
+  //        log.warn("Could not find testing file for competition submission id: {} ", competitionId);
+  //        return new UploadException("Could not find testing file for competition");
+  //      });
+  //  }
 
   @Override
-  public Resource loadTrainingFileAsResource(final Integer uploadId) {
-    return uploadService.getByCompetitionIdAndType(uploadId, "training")
+  public Resource loadFileAsResource(final Integer competitionId, final FileLogicType type) {
+    return uploadService.getByCompetitionIdAndType(competitionId, type)
       .map(upload -> loadAsResource(upload.getRefLink()))
-      .orElseThrow(() -> new CompetitionException("Could not find competition with id: " + uploadId));
+      .orElseThrow(() -> {
+        log.warn("Could not find {} file for competition submission id: {} ", type.getName(), competitionId);
+        return new UploadException("Could not find testing file for this competition");
+      });
   }
 
-  @Override
-  public Resource loadTestingFileAsResource(final Integer uploadId) {
-    return uploadService.getByCompetitionIdAndType(uploadId, "testing")
-      .map(upload -> loadAsResource(upload.getRefLink()))
-      .orElseThrow(() -> new UploadException("Could not find upload with id: " + uploadId));
-  }
 }

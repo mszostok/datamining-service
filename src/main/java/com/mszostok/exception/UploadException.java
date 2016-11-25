@@ -1,6 +1,6 @@
 package com.mszostok.exception;
 
-public class UploadException extends RuntimeException{
+public class UploadException extends RuntimeException {
   public UploadException(final String message) {
     super(message);
   }

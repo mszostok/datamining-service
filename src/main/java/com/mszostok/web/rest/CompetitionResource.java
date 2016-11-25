@@ -2,6 +2,7 @@ package com.mszostok.web.rest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
+import com.mszostok.enums.FileLogicType;
 import com.mszostok.service.CompetitionService;
 import com.mszostok.service.DescriptionService;
 import com.mszostok.service.StorageService;
@@ -104,7 +105,7 @@ public class CompetitionResource {
 
   @GetMapping("/{id}/dataset/training")
   public ResponseEntity<Resource> serveTrainingFile(@PathVariable final Integer id) {
-    Resource file = storageService.loadTrainingFileAsResource(id);
+    Resource file = storageService.loadFileAsResource(id, FileLogicType.TRAINING);
     return ResponseEntity.ok()
       .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
       .body(file);
@@ -112,10 +113,18 @@ public class CompetitionResource {
 
   @GetMapping("/{id}/dataset/testing")
   public ResponseEntity<Resource> serveTestingFile(@PathVariable final Integer id) {
-    Resource file = storageService.loadTestingFileAsResource(id);
+    Resource file = storageService.loadFileAsResource(id, FileLogicType.TESTING);
     return ResponseEntity.ok()
       .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
       .body(file);
+
+  }
+
+  @PostMapping("/{id}/submission")
+  @ResponseStatus(OK)
+  public void postSubmission(@RequestParam("file") final MultipartFile file,
+                             @PathVariable("id") final Integer competitionId) {
+    competitionService.processSubmission(file, competitionId);
   }
 
 }

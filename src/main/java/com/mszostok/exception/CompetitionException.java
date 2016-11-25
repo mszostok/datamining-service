@@ -1,6 +1,6 @@
 package com.mszostok.exception;
 
-public class CompetitionException extends RuntimeException{
+public class CompetitionException extends RuntimeException {
   public CompetitionException(final String message) {
     super(message);
   }
@@ -9,4 +9,3 @@ public class CompetitionException extends RuntimeException{
     super(message, cause);
   }
 }
-
