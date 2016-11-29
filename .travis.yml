@@ -3,3 +3,16 @@ jdk:
   - oraclejdk8
 sudo: false
 script: mvn clean package
+deploy:
+  on:
+      branch: develop
+  skip_cleanup: true
+  provider: elasticbeanstalk
+  access-key-id: AKIAIOLTGUTBUJEL6NNA
+  secret-access-key: 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
+  region: eu-west-1
+  app: datamining-service
+  env: Custom-env
+  bucket_name: elasticbeanstalk-eu-west-1-322930184898
+  zip_file: '/target/backend-project.zip'
+
