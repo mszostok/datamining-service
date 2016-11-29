@@ -1,5 +1,6 @@
 package com.mszostok.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,9 +17,10 @@ import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.SEQUENCE;
 
 @Entity
-@Table(name = "descriptions", schema = "public")
 @Getter
 @Setter
+@EqualsAndHashCode
+@Table(name = "descriptions", schema = "public")
 public class Description {
 
   @Id

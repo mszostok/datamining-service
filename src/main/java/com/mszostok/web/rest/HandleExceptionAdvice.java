@@ -2,6 +2,7 @@ package com.mszostok.web.rest;
 
 import com.mszostok.exception.CompetitionException;
 import com.mszostok.exception.DescriptionException;
+import com.mszostok.exception.IllegalArgException;
 import com.mszostok.exception.InternalException;
 import com.mszostok.exception.SubmissionException;
 import com.mszostok.exception.UploadException;
@@ -49,6 +50,15 @@ public class HandleExceptionAdvice {
   ModelMap handleCustomInternalException(final InternalException ex) {
     return new ModelMap().addAttribute("error", ex.getMessage());
   }
+
+  @ResponseStatus(BAD_REQUEST)
+  @ExceptionHandler(IllegalArgException.class)
+  @ResponseBody
+  ModelMap handleIllegalArgException(final IllegalArgException ex) {
+    return new ModelMap().addAttribute("error", ex.getMessage());
+  }
+
+
 
   @ResponseStatus(PAYLOAD_TOO_LARGE)
   @ExceptionHandler({MultipartException.class, FileUploadBase.FileSizeLimitExceededException.class})

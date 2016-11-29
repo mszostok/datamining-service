@@ -25,7 +25,7 @@ public class CompetitionCollectionDto {
     this.id = competition.getIdCompetition();
     this.name = competition.getName();
     this.shortDescription = competition.getShortDesc();
-    this.author = competition.getUser().getFirstName() + " " + competition.getUser().getLastName();
+    this.author = competition.getUser().getUsername();
   }
 
   public CompetitionCollectionDto() {

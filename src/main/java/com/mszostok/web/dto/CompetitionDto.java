@@ -29,4 +29,6 @@ public class CompetitionDto {
   private String formulaDescription;
   @NotEmpty
   private String datasetDescription;
+  @NotNull
+  private Integer scoreFnId;
 }

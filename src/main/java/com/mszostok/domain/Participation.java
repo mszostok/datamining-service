@@ -1,5 +1,6 @@
 package com.mszostok.domain;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.joda.time.DateTime;
@@ -19,6 +20,7 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Entity
 @Getter
 @Setter
+@EqualsAndHashCode
 @Table(name = "participation", schema = "public")
 public class Participation {
   @Id
@@ -43,36 +45,4 @@ public class Participation {
   @JoinColumn(name = "competitions_id_competition")
   private Competition competition;
 
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-
-    Participation that = (Participation) obj;
-
-    if (idParticipation != that.idParticipation) return false;
-    if (Double.compare(that.lastScore, lastScore) != 0) return false;
-    if (Double.compare(that.bestScore, bestScore) != 0) return false;
-    if (takeNumber != null ? !takeNumber.equals(that.takeNumber) : that.takeNumber != null) return false;
-    if (lastTakeDate != null ? !lastTakeDate.equals(that.lastTakeDate) : that.lastTakeDate != null) return false;
-    if (user != null ? !user.equals(that.user) : that.user != null) return false;
-    return competition != null ? competition.equals(that.competition) : that.competition == null;
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result;
-    long temp;
-    result = idParticipation;
-    temp = Double.doubleToLongBits(lastScore);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    temp = Double.doubleToLongBits(bestScore);
-    result = 31 * result + (int) (temp ^ (temp >>> 32));
-    result = 31 * result + (takeNumber != null ? takeNumber.hashCode() : 0);
-    result = 31 * result + (lastTakeDate != null ? lastTakeDate.hashCode() : 0);
-    result = 31 * result + (user != null ? user.hashCode() : 0);
-    result = 31 * result + (competition != null ? competition.hashCode() : 0);
-    return result;
-  }
 }

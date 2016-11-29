@@ -37,6 +37,9 @@ public class Competition {
   @Column(name = "name", nullable = false, length = 50)
   private String name;
 
+  @Column(name = "score_fn_id", nullable = false, length = 50)
+  private Integer scoreFnId;
+
   @Column(name = "short_desc", nullable = false, length = 255)
   private String shortDesc;
 

@@ -44,14 +44,14 @@ public class AjaxLoginProcessingFilter extends AbstractAuthenticationProcessingF
       throw new AuthenticationServiceException("Authentication method not supported");
     }
 
-    String username = req.getParameter("username");
+    String email = req.getParameter("email");
     String password = req.getParameter("password");
 
-    if (Strings.isNullOrEmpty(username) || Strings.isNullOrEmpty(password)) {
-      throw new AuthenticationServiceException("Username or Password not provided");
+    if (Strings.isNullOrEmpty(email) || Strings.isNullOrEmpty(password)) {
+      throw new AuthenticationServiceException("Email or Password not provided");
     }
 
-    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(username, password);
+    UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
 
     return this.getAuthenticationManager().authenticate(token);
   }

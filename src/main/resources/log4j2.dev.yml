@@ -14,12 +14,6 @@ Configutation:
       PatternLayout:
         pattern: "%highlight{[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n}"
 
-    File:
-      name: File_Appender
-      fileName: ${log-path}/backend.log
-      PatternLayout:
-        pattern: "[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %c{1} - %msg%n"
-
   Loggers:
 
       Root:
@@ -33,6 +27,4 @@ Configutation:
           level: debug
           AppenderRef:
             - ref: ConsoleAppender
-              level: debug
-            - ref: File_Appender
               level: debug

@@ -35,11 +35,11 @@ public class AjaxAwareAuthenticationFailureHandler implements AuthenticationFail
 
     //TODO: add for token bad credentials (Invalid token)
     if (ex instanceof BadCredentialsException)
-      mapper.writeValue(response.getWriter(), ErrorResponse.of("Invalid username or password", HttpStatus.UNAUTHORIZED));
+      mapper.writeValue(response.getWriter(), ErrorResponse.of("Invalid email or password", HttpStatus.UNAUTHORIZED));
     else if (ex instanceof JwtTokenExpiredException)
       mapper.writeValue(response.getWriter(), ErrorResponse.of("Token has expired", HttpStatus.UNAUTHORIZED));
     else if (ex instanceof UsernameNotFoundException)
-      mapper.writeValue(response.getWriter(), ErrorResponse.of("Invalid username", HttpStatus.UNAUTHORIZED));
+      mapper.writeValue(response.getWriter(), ErrorResponse.of("Invalid email", HttpStatus.UNAUTHORIZED));
     else if (ex instanceof AuthenticationServiceException)
       mapper.writeValue(response.getWriter(), ErrorResponse.of(ex.getMessage(), HttpStatus.UNAUTHORIZED));
     else

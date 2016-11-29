@@ -2,6 +2,7 @@ package com.mszostok.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.google.common.base.MoreObjects;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,9 +21,10 @@ import static javax.persistence.GenerationType.SEQUENCE;
  * User role (authorities which have) entity model.
  */
 @Entity
-@Table(name = "user_roles", schema = "public")
 @Getter
 @Setter
+@EqualsAndHashCode
+@Table(name = "user_roles", schema = "public")
 public class UserRole {
 
   @Id
@@ -45,28 +47,6 @@ public class UserRole {
   public UserRole(final String role, final User user) {
     this.role = role;
     this.user = user;
-  }
-
-  @Override
-  public boolean equals(final Object obj) {
-    if (this == obj) return true;
-    if (obj == null || getClass() != obj.getClass()) return false;
-
-    UserRole userRole = (UserRole) obj;
-
-    if (idUserRoles != null ? !idUserRoles.equals(userRole.idUserRoles) : userRole.idUserRoles != null)
-      return false;
-    if (role != null ? !role.equals(userRole.role) : userRole.role != null) return false;
-    return user != null ? user.equals(userRole.user) : userRole.user == null;
-
-  }
-
-  @Override
-  public int hashCode() {
-    int result = idUserRoles != null ? idUserRoles.hashCode() : 0;
-    result = 31 * result + (role != null ? role.hashCode() : 0);
-    result = 31 * result + (user != null ? user.hashCode() : 0);
-    return result;
   }
 
   @Override

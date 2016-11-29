@@ -179,7 +179,7 @@ public class FileSystemStorageService implements StorageService {
   //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TRAINING)
   //      .map(upload -> loadAsResource(upload.getRefLink()))
   //      .orElseThrow(() -> {
-  //        log.warn("Could not find trainig file for competition submission id: {} ", competitionId);
+  //        log.warn("Could not find trainig file for competition submission rank: {} ", competitionId);
   //        return new UploadException("Could not find testing file for competition");
   //      });
   //  }
@@ -189,7 +189,7 @@ public class FileSystemStorageService implements StorageService {
   //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TESTING)
   //      .map(upload -> loadAsResource(upload.getRefLink()))
   //      .orElseThrow(() -> {
-  //        log.warn("Could not find testing file for competition submission id: {} ", competitionId);
+  //        log.warn("Could not find testing file for competition submission rank: {} ", competitionId);
   //        return new UploadException("Could not find testing file for competition");
   //      });
   //  }
@@ -200,7 +200,7 @@ public class FileSystemStorageService implements StorageService {
       .map(upload -> loadAsResource(upload.getRefLink()))
       .orElseThrow(() -> {
         log.warn("Could not find {} file for competition submission id: {} ", type.getName(), competitionId);
-        return new UploadException("Could not find testing file for this competition");
+        return new UploadException(String.format("Could not find %s file for this competition", type.getName()));
       });
   }
 
