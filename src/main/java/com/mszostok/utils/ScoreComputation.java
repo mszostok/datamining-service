@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScoreComputation {
 
-  public static Double checkAll(final List<String[]> keyList, final List<String[]> submissionList, final Object... properties) {
+  public static Double matchAll(final List<String[]> keyList, final List<String[]> submissionList, final Object... properties) {
     final AtomicInteger idx = new AtomicInteger();
     final AtomicInteger points = new AtomicInteger();
 

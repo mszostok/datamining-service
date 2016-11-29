@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Swagger UI</title>
+    <link rel="icon" type="image/png" href="images/favicon-32x32.png" sizes="32x32"/>
+    <link rel="icon" type="image/png" href="images/favicon-16x16.png" sizes="16x16"/>
+    <link href='css/typography.css' media='screen' rel='stylesheet' type='text/css'/>
+    <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+
+    <script src='js/object-assign-pollyfill.js' type='text/javascript'></script>
+    <script src='js/jquery-1.8.0.min.js' type='text/javascript'></script>
+    <script src='js/jquery.slideto.min.js' type='text/javascript'></script>
+    <script src='js/jquery.wiggle.min.js' type='text/javascript'></script>
+    <script src='js/jquery.ba-bbq.min.js' type='text/javascript'></script>
+    <script src='js/handlebars-2.0.0.js' type='text/javascript'></script>
+    <script src='js/js-yaml.min.js' type='text/javascript'></script>
+    <script src='js/lodash.min.js' type='text/javascript'></script>
+    <script src='js/backbone-min.js' type='text/javascript'></script>
+    <script src='js/swagger-ui.js' type='text/javascript'></script>
+    <script src='js/highlight.9.1.0.pack.js' type='text/javascript'></script>
+    <script src='js/highlight.9.1.0.pack_extended.js' type='text/javascript'></script>
+    <script src='js/jsoneditor.min.js' type='text/javascript'></script>
+    <script src='js/marked.js' type='text/javascript'></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <!-- Some basic translations -->
+    <script src='lang/translator.js' type='text/javascript'></script>
+    <script src='lang/pl.js' type='text/javascript'></script>
+    <!-- <script src='lang/en.js' type='text/javascript'></script> -->
+
+    <script type="text/javascript">
+        $(function () {
+            console.log(window.location.host);
+            var url = "/api/swagger.json";
+            hljs.configure({
+                highlightSizeThreshold: 5000
+            });
+
+            // Pre load translate...
+            if (window.SwaggerTranslator) {
+                window.SwaggerTranslator.translate();
+            }
+            window.swaggerUi = new SwaggerUi({
+                url: url,
+                dom_id: "swagger-ui-container",
+                supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+                onComplete: function (swaggerApi, swaggerUi) {
+                    if (window.SwaggerTranslator) {
+                        window.SwaggerTranslator.translate();
+                    }
+                },
+                onFailure: function (data) {
+                    log("Unable to Load SwaggerUI");
+                },
+                docExpansion: "none",
+                jsonEditor: false,
+                defaultModelRendering: 'schema',
+                showRequestHeaders: false
+            });
+            window.swaggerUi.load();
+
+            $('#input_token').change(function () {
+                var token = $('#input_token')[0].value;
+
+                if (token && token.trim() != "") {
+                    var auth = "Bearer " + token;
+                    window.swaggerUi.api.clientAuthorizations.add("key", new SwaggerClient.ApiKeyAuthorization("Authorization", auth, "header"));
+                } else {
+                    window.swaggerUi.api.clientAuthorizations.remove("key");
+                }
+            });
+
+            function log() {
+                if ('console' in window) {
+                    console.log.apply(console, arguments);
+                }
+            }
+        });
+    </script>
+</head>
+
+<body class="swagger-section">
+<div id="header" style="height: auto">
+    <div class="swagger-ui-wrap">
+        <a id="logo" href="http://swagger.io"><img class="logo__img" alt="swagger" src="images/logo_small.png" height="30" width="30"><span class="logo__title">swagger</span></a>
+        <form class="navbar-form navbar-right" style="margin-top: 0px; ">
+            <div class="input-group input-group-sm">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-lock" aria-hidden="true"></i></span>
+                <input class="form-control" placeholder="token" id="input_token" name="token" type="text"/>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="container" style="margin: 0px;">
+    <div class="row">
+        <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>&nbsp;</div>
+        <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
+    </div>
+</div>
+</body>
+</html>

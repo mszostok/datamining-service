@@ -8,7 +8,7 @@ import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.CompetitionException;
 import com.mszostok.exception.InternalException;
 import com.mszostok.exception.SubmissionException;
-import com.mszostok.model.Leaderboard;
+import com.mszostok.model.Member;
 import com.mszostok.repository.CompetitionRepository;
 import com.mszostok.repository.DescriptionRepository;
 import com.mszostok.repository.ParticipationRepository;
@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -77,24 +78,26 @@ public class CompetitionService {
         PageRequest pageRequest = new PageRequest(0, MAX_LEADEBOARD_SIZE, Sort.Direction.DESC, "bestScore");
         Page<Participation> topParticipation = participationRepository.findByCompetition_IdCompetition(idCompetition, pageRequest);
 
-        Leaderboard leaderboard = new Leaderboard();
         AtomicInteger idx = new AtomicInteger();
+        List<Member> leaderboard = new LinkedList<>();
+        topParticipation.forEach(p -> leaderboard.add(new Member(idx.incrementAndGet(), p.getUser().getUsername())));
 
-        topParticipation.forEach(p -> leaderboard.getMembers().put(idx.incrementAndGet(), p.getUser().getUsername()));
         generalInfo.setLeaderboard(leaderboard);
         return generalInfo;
       })
-      .orElseThrow(() -> new CompetitionException("Could not find competition submission id: " + idCompetition));
+      .orElseThrow(() -> new CompetitionException("Could not find competition with id: " + idCompetition));
   }
 
   public Integer save(final CompetitionDto competitionDto) {
     //TODO: remove html
     Competition competition = new Competition();
     competition.setName(competitionDto.getName());
-    competition.setStartDate(competitionDto.getStartDate());
     competition.setEndDate(competitionDto.getEndDate());
+    competition.setStartDate(competitionDto.getStartDate());
+    competition.setScoreFnId(competitionDto.getScoreFnId());
     competition.setShortDesc(competitionDto.getShortDescription());
     competition.setUser(userService.getCurrentLoggedUser());
+
     Competition savedCompetition = competitionRepository.save(competition);
 
     Description description = new Description();
@@ -113,8 +116,10 @@ public class CompetitionService {
   }
 
   public void processSubmission(final MultipartFile file, final Integer competitionId) {
+    //TODO: only active
     try {
       Resource keyFile = storageService.loadFileAsResource(competitionId, FileLogicType.KEY);
+      Integer scoreFnId = getCompetition(competitionId).getScoreFnId();
 
       CSVReader submissionCSVFile = new CSVReader(new InputStreamReader(file.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
       CSVReader keyCSVFile = new CSVReader(new InputStreamReader(keyFile.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
@@ -129,9 +134,10 @@ public class CompetitionService {
       }
 
       Double actualScore = scoreFor()
-                          .submission(submissionList)
-                          .and().key(keyList)
-                          .withMetric("checkAll");
+        .submission(submissionList)
+        .and().key(keyList)
+        .withMetric(ScoreComputationService.ScoreFunctionType.find(scoreFnId));
+
       participationService.saveParticipation(userService.getCurrentLoggedUser(), competitionId, actualScore);
     } catch (IOException ex) {
       log.error("while processing submission with file: {} for competition: {}, :", file.getOriginalFilename(), competitionId, ex);

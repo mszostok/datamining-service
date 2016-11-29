@@ -49,7 +49,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Bean
   protected JwtTokenAuthenticationProcessingFilter buildJwtTokenAuthenticationProcessingFilter() throws Exception {
-    List<String> pathsToSkip = Arrays.asList(TOKEN_REFRESH_ENTRY_POINT, "/register");
+    List<String> pathsToSkip = Arrays.asList(TOKEN_REFRESH_ENTRY_POINT, "/register", "/api-console", "/index.html",
+                                              "/images/**", "/js/**", "/css/**", "/lang/**", "/swagger.json");
     log.info("Path skipped from authorization: {}", pathsToSkip);
 
     SkipPathRequestMatcher matcher = new SkipPathRequestMatcher(pathsToSkip, TOKEN_BASED_AUTH_ENTRY_POINT);

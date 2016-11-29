@@ -1,0 +1,719 @@
+{
+  "swagger" : "2.0",
+  "info" : {
+    "description" : "Service REST API Spec",
+    "version" : "\"v1\"",
+    "title" : "Data Mining Competition"
+  },
+  "host" : "http://custom-env.dudjzicpak.eu-west-1.elasticbeanstalk.com/",
+  "basePath" : "/api",
+  "tags" : [ {
+    "name" : "competitions",
+    "description" : "Operations about competitions"
+  }, {
+    "name" : "register"
+  }, {
+    "name" : "user : Operations about user"
+  }, {
+    "name" : "auth : Operation about authentication"
+  } ],
+  "schemes" : [ "http", "https" ],
+  "paths" : {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Get token",
+        "description": "",
+        "operationId": "getToken",
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string",
+            "required": true,
+            "allowMultiple": false
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string",
+            "required": true,
+            "allowMultiple": false
+          }
+        ],
+        "consumes": [
+          "application/x-www-form-urlencoded"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Something wrong in Server."
+          }
+        }
+      }
+    },
+    "/competitions" : {
+      "post" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Save competition",
+        "description" : "",
+        "operationId" : "saveCompetition",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CompetitionDto"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/active" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get all active competition",
+        "description" : "",
+        "operationId" : "getAllActiveCompetitions",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/CompetitionCollectionDto"
+              }
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/score-functions" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get all available score functions",
+        "description" : "",
+        "operationId" : "getAllScoreFunctions",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/ScoreFnDto"
+              }
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/dataset/testing" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Download testing file for requested competition",
+        "description" : "",
+        "operationId" : "serveTestingFile",
+        "parameters" : [ {
+          "name" : "",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/Resource"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Upload testing file for selected competition",
+        "description" : "",
+        "operationId" : "handleTestingFileUpload",
+        "parameters" : [ {
+          "name" : "file",
+          "in" : "query",
+          "required" : true,
+          "type" : "ref"
+        }, {
+          "name" : "",
+          "in" : "formData",
+          "required" : true,
+          "type" : "file"
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/dataset/training" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Download training file for requested competition",
+        "description" : "",
+        "operationId" : "serveTrainingFile",
+        "parameters" : [ {
+          "name" : "",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/Resource"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Upload training file for selected competition",
+        "description" : "",
+        "operationId" : "handleTrainingFileUpload",
+        "parameters" : [ {
+          "name" : "file",
+          "in" : "query",
+          "required" : true,
+          "type" : "ref"
+        }, {
+          "name" : "",
+          "in" : "formData",
+          "required" : true,
+          "type" : "file"
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/description/dataset" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get dataset description for requested competition",
+        "description" : "",
+        "operationId" : "getDatasetDescriptionForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/description/formula" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get formula description for requested competition",
+        "description" : "",
+        "operationId" : "getFormulaForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/description/introduction" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get introduction description for requested competition",
+        "description" : "",
+        "operationId" : "getIntroductionForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/general-info" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get general info for requested competition",
+        "description" : "",
+        "operationId" : "getGeneralInfoForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/CompetitionGeneralInfoDto"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}/submission" : {
+      "post" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Send submission file for active competition",
+        "description" : "",
+        "operationId" : "postSubmission",
+        "parameters" : [ {
+          "name" : "file",
+          "in" : "query",
+          "required" : true,
+          "type" : "ref"
+        }, {
+          "name" : "",
+          "in" : "formData",
+          "required" : true,
+          "type" : "file"
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/profile" : {
+      "get" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Get all available score functions",
+        "description" : "",
+        "operationId" : "getProfile",
+        "produces" : [ "application/json" ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/UserDto"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Get all available score functions",
+        "description" : "",
+        "operationId" : "updateProfile",
+        "produces" : [ "application/json", "text/plain" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/UserDto"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/ScoreFnDto"
+              }
+            }
+          },
+          "404" : {
+            "description" : "Validation error, more information will be provided in sent json"
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/register" : {
+      "post" : {
+        "tags" : [ "register" ],
+        "summary" : "Register new user",
+        "description" : "",
+        "operationId" : "registerAccount",
+        "produces" : [ "application/json", "text/plain" ],
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/UserDto"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "201" : {
+            "description" : "User created successful"
+          },
+          "404" : {
+            "description" : "When validating issues occurred, more information will be described in response json"
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    }
+  },
+  "securityDefinitions" : {
+    "api_key" : {
+      "type" : "apiKey"
+    }
+  },
+  "definitions" : {
+    "CompetitionCollectionDto" : {
+      "type" : "object",
+      "required" : [ "id" ],
+      "properties" : {
+        "id" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "shortDescription" : {
+          "type" : "string"
+        },
+        "author" : {
+          "type" : "string"
+        }
+      }
+    },
+    "CompetitionDto" : {
+      "type" : "object",
+      "required" : [ "endDate", "scoreFnId", "startDate" ],
+      "properties" : {
+        "name" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "startDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "endDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "shortDescription" : {
+          "type" : "string"
+        },
+        "introductionDescription" : {
+          "type" : "string"
+        },
+        "formulaDescription" : {
+          "type" : "string"
+        },
+        "datasetDescription" : {
+          "type" : "string"
+        },
+        "scoreFnId" : {
+          "type" : "integer",
+          "format" : "int32"
+        }
+      }
+    },
+    "CompetitionGeneralInfoDto" : {
+      "type" : "object",
+      "properties" : {
+        "leaderboard" : {
+          "type" : "array",
+          "items" : {
+            "$ref" : "#/definitions/Member"
+          }
+        },
+        "startDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "endDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "author" : {
+          "type" : "string"
+        }
+      }
+    },
+    "File" : {
+      "type" : "object",
+      "properties" : {
+        "path" : {
+          "type" : "string"
+        },
+        "name" : {
+          "type" : "string"
+        },
+        "parent" : {
+          "type" : "string"
+        },
+        "absolute" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "canonicalPath" : {
+          "type" : "string"
+        },
+        "parentFile" : {
+          "$ref" : "#/definitions/File"
+        },
+        "absolutePath" : {
+          "type" : "string"
+        },
+        "absoluteFile" : {
+          "$ref" : "#/definitions/File"
+        },
+        "canonicalFile" : {
+          "$ref" : "#/definitions/File"
+        },
+        "directory" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "file" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "hidden" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "totalSpace" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "freeSpace" : {
+          "type" : "integer",
+          "format" : "int64"
+        },
+        "usableSpace" : {
+          "type" : "integer",
+          "format" : "int64"
+        }
+      }
+    },
+    "InputStream" : {
+      "type" : "object"
+    },
+    "Member" : {
+      "type" : "object",
+      "required" : [ "rank" ],
+      "properties" : {
+        "rank" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "username" : {
+          "type" : "string"
+        }
+      }
+    },
+    "Resource" : {
+      "type" : "object",
+      "properties" : {
+        "url" : {
+          "type" : "string",
+          "format" : "url"
+        },
+        "file" : {
+          "$ref" : "#/definitions/File"
+        },
+        "open" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "description" : {
+          "type" : "string"
+        },
+        "uri" : {
+          "type" : "string",
+          "format" : "uri"
+        },
+        "readable" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "filename" : {
+          "type" : "string"
+        },
+        "inputStream" : {
+          "$ref" : "#/definitions/InputStream"
+        }
+      }
+    },
+    "ScoreFnDto" : {
+      "type" : "object",
+      "properties" : {
+        "id" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "UserDto" : {
+      "type" : "object",
+      "properties" : {
+        "username" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "firstName" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "lastName" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "email" : {
+          "type" : "string",
+          "minLength" : 5,
+          "maxLength" : 100
+        },
+        "city" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "country" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 50
+        },
+        "postalCode" : {
+          "type" : "string",
+          "minLength" : 0,
+          "maxLength" : 10
+        },
+        "password" : {
+          "type" : "string",
+          "minLength" : 4,
+          "maxLength" : 100
+        },
+        "activated" : {
+          "type" : "boolean",
+          "default" : false
+        },
+        "authorities" : {
+          "type" : "array",
+          "uniqueItems" : true,
+          "items" : {
+            "type" : "string"
+          }
+        }
+      }
+    }
+  }
+}
