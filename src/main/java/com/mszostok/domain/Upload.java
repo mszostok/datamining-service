@@ -1,5 +1,6 @@
 package com.mszostok.domain;
 
+import com.google.common.base.MoreObjects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,4 +43,13 @@ public class Upload {
   @JoinColumn(name = "competitions_id_competition")
   private Competition competition;
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("idUpload", idUpload)
+      .add("originalFileName", originalFileName)
+      .add("logicType", logicType)
+      .add("refLink", refLink)
+      .toString();
+  }
 }

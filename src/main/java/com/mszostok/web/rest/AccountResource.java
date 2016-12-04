@@ -52,7 +52,7 @@ public class AccountResource {
   @ApiOperation(value = "Register new user")
   @ApiResponses(value = {
         @ApiResponse(code = 201, message = "User created successful"),
-        @ApiResponse(code = 404, message = "When validating issues occurred, more information will be described in response json"),
+        @ApiResponse(code = 400, message = "When validating issues occurred, more information will be described in response json"),
         @ApiResponse(code = 500, message = "Something went wrong in Server")
       })
   @RequestMapping(value = "/register", produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE}, method = POST)

@@ -54,7 +54,6 @@ public class UserRole {
     return MoreObjects.toStringHelper(this)
       .add("idUserRoles", idUserRoles)
       .add("role", role)
-      .add("user", user)
       .toString();
   }
 }

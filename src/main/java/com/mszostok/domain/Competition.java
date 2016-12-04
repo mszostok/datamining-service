@@ -1,5 +1,6 @@
 package com.mszostok.domain;
 
+import com.google.common.base.MoreObjects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -58,4 +59,16 @@ public class Competition {
 
   @OneToOne(mappedBy = "competition")
   private Description description;
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("idCompetition", idCompetition)
+      .add("name", name)
+      .add("scoreFnId", scoreFnId)
+      .add("shortDesc", shortDesc)
+      .add("startDate", startDate)
+      .add("endDate", endDate)
+      .toString();
+  }
 }

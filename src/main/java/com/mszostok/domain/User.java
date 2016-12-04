@@ -1,6 +1,7 @@
 package com.mszostok.domain;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.google.common.base.MoreObjects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -69,5 +70,20 @@ public final class User {
   @Column(name = "is_active", nullable = false)
   private boolean active;
 
-
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("idUser", idUser)
+      .add("username", username)
+      .add("firstName", firstName)
+      .add("lastName", lastName)
+      .add("email", email)
+      .add("password", password)
+      .add("city", city)
+      .add("country", country)
+      .add("postalCode", postalCode)
+      .add("roles", roles)
+      .add("isActive", active)
+      .toString();
+  }
 }

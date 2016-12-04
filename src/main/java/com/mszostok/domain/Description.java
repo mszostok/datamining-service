@@ -1,5 +1,6 @@
 package com.mszostok.domain;
 
+import com.google.common.base.MoreObjects;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,4 +43,13 @@ public class Description {
   @JoinColumn(name = "competitions_id_competition")
   private Competition competition;
 
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+      .add("idDescription", idDescription)
+      .add("introduction", introduction)
+      .add("formula", formula)
+      .add("dataset", dataset)
+      .toString();
+  }
 }

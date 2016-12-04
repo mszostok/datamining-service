@@ -42,8 +42,8 @@ spring:
   ## Upload file ##
   http:
     multipart:
-      max-file-size: 512KB
-      maxRequestSize: 512KB
+      max-file-size: 100MB
+      maxRequestSize: 100MB
 
 
 ### Application specific  ###
