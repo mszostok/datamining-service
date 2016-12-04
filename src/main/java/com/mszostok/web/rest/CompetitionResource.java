@@ -10,6 +10,7 @@ import com.mszostok.service.StorageService;
 import com.mszostok.web.dto.CompetitionCollectionDto;
 import com.mszostok.web.dto.CompetitionDto;
 import com.mszostok.web.dto.CompetitionGeneralInfoDto;
+import com.mszostok.web.dto.ManageCompetitionCollectionDto;
 import com.mszostok.web.dto.ScoreFnDto;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,6 +39,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
 import static org.springframework.web.bind.annotation.RequestMethod.POST;
 
@@ -69,7 +72,29 @@ public class CompetitionResource {
     mapper.registerModule(new JodaModule());
   }
 
-  @ApiOperation(value = "Get all active competition", response = CompetitionCollectionDto.class, responseContainer = "List")
+  @ApiOperation(value = "Get all  competitions", response = CompetitionCollectionDto.class, responseContainer = "List")
+  @ApiResponses(value = {
+        @ApiResponse(code = 500, message = "Something went wrong in Server")
+      })
+  @ResponseStatus(OK)
+  @RequestMapping(method = GET)
+  public Collection<ManageCompetitionCollectionDto> getAllCompetitions() {
+    //TODO: sort, pageable
+    return competitionService.getAllCompetitions();
+  }
+
+  @PreAuthorize("hasAuthority('ADMIN')")
+  @ApiOperation(value = "Delete competition by id. You will need to have admin scope")
+  @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 500, message = "Something wrong in Server")})
+  @ResponseStatus(NO_CONTENT)
+  @RequestMapping(value = "/{id}", method = DELETE)
+  public void deleteCompetition(@PathVariable("id") final Integer id) {
+    competitionService.deleteCompetition(id);
+  }
+
+  @ApiOperation(value = "Get all active competitions", response = CompetitionCollectionDto.class, responseContainer = "List")
   @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Something went wrong in Server")
       })
@@ -87,9 +112,7 @@ public class CompetitionResource {
   @ResponseStatus(OK)
   @RequestMapping(value = "/{id}/general-info", method = GET)
   public CompetitionGeneralInfoDto getGeneralInfoForCompetition(@PathVariable("id") final Integer competitionId) {
-    CompetitionGeneralInfoDto generalInfoFor = competitionService.getGeneralInfoFor(competitionId);
-    System.out.println(generalInfoFor.getStartDate());
-    return generalInfoFor;
+    return competitionService.getGeneralInfoFor(competitionId);
   }
 
   @ApiOperation(value = "Save competition")

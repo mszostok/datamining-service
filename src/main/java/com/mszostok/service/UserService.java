@@ -3,9 +3,11 @@ package com.mszostok.service;
 
 import com.mszostok.domain.User;
 import com.mszostok.domain.UserRole;
+import com.mszostok.exception.UserNotFoundException;
 import com.mszostok.repository.UserRepository;
 import com.mszostok.repository.UserRoleRepository;
 import com.mszostok.utils.SecurityUtils;
+import com.mszostok.web.dto.ManageActiveDto;
 import com.mszostok.web.dto.UserDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,6 +112,30 @@ public class UserService {
 
         return user;
       })
-      .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email));
+      .orElseThrow(() -> new UsernameNotFoundException("User not found: " + email)); //TODO: username probably not working
+  }
+
+  public void changePassword(final String newPassword) {
+    String encryptedPassword = passwordEncoder.encode(newPassword);
+
+    getCurrentLoggedUser().setPassword(encryptedPassword);
+  }
+
+  public void deleteUserById(final Integer id) {
+    if (userRepository.findOne(id) == null) {
+      throw new UserNotFoundException(String.format("User with id: %s does not exits", id));
+    }
+    userRepository.delete(id);
+
+  }
+
+  public void setActiveById(final Integer id, final ManageActiveDto manageActiveDto) {
+    User user = userRepository.findOne(id);
+
+    if (user == null) {
+      throw new UserNotFoundException(String.format("User with id: %s does not exits", id));
+    }
+
+    user.setActive(manageActiveDto.getIsActive());
   }
 }

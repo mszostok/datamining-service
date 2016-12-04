@@ -25,7 +25,7 @@ public class UploadService {
 
   public Upload save(final Integer competitionId, final String filename, final FileLogicType type,
                      final String refLink) throws CompetitionException {
-    Competition competition = competitionService.getCompetition(competitionId);
+    Competition competition = competitionService.getActiveCompetitionById(competitionId);
 
     if (!competition.getUser().equals(userService.getCurrentLoggedUser())) {
       throw new CompetitionException("Logged user is not owner of competition: " + competition.getName());

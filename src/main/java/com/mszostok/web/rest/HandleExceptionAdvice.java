@@ -4,8 +4,10 @@ import com.mszostok.exception.CompetitionException;
 import com.mszostok.exception.DescriptionException;
 import com.mszostok.exception.IllegalArgException;
 import com.mszostok.exception.InternalException;
+import com.mszostok.exception.ParticipationException;
 import com.mszostok.exception.SubmissionException;
 import com.mszostok.exception.UploadException;
+import com.mszostok.exception.UserNotFoundException;
 import org.apache.tomcat.util.http.fileupload.FileUploadBase;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.FieldError;
@@ -37,8 +39,8 @@ public class HandleExceptionAdvice {
   }
 
   @ResponseStatus(BAD_REQUEST)
-  @ExceptionHandler({CompetitionException.class, UploadException.class,
-    DescriptionException.class, SubmissionException.class})
+  @ExceptionHandler({CompetitionException.class, UploadException.class, ParticipationException.class,
+    DescriptionException.class, SubmissionException.class, UserNotFoundException.class})
   @ResponseBody
   ModelMap handleCompetitionException(final RuntimeException ex) {
     return new ModelMap().addAttribute("error", ex.getMessage());

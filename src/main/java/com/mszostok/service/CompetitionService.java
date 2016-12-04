@@ -4,9 +4,11 @@ import com.google.common.base.Charsets;
 import com.mszostok.domain.Competition;
 import com.mszostok.domain.Description;
 import com.mszostok.domain.Participation;
+import com.mszostok.domain.User;
 import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.CompetitionException;
 import com.mszostok.exception.InternalException;
+import com.mszostok.exception.ParticipationException;
 import com.mszostok.exception.SubmissionException;
 import com.mszostok.model.Member;
 import com.mszostok.repository.CompetitionRepository;
@@ -15,6 +17,7 @@ import com.mszostok.repository.ParticipationRepository;
 import com.mszostok.web.dto.CompetitionCollectionDto;
 import com.mszostok.web.dto.CompetitionDto;
 import com.mszostok.web.dto.CompetitionGeneralInfoDto;
+import com.mszostok.web.dto.ManageCompetitionCollectionDto;
 import com.opencsv.CSVReader;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
@@ -43,7 +46,9 @@ import static com.mszostok.service.ScoreComputationService.scoreFor;
 @Transactional
 public class CompetitionService {
   public static final char CSV_SEPARATOR = ',';
-  public static final int MAX_LEADEBOARD_SIZE = 10;
+  public static final int MAX_LEADERBOARD_SIZE = 10;
+  public static final int FREQUENCY_OF_PARTICIPATION_IN_MIN = 10; //TODO: env + default
+
   @Autowired
   private DescriptionRepository descriptionRepository;
 
@@ -75,7 +80,7 @@ public class CompetitionService {
     return Optional.ofNullable(competitionRepository.findOne(idCompetition))
       .map(CompetitionGeneralInfoDto::new)
       .map(generalInfo -> {
-        PageRequest pageRequest = new PageRequest(0, MAX_LEADEBOARD_SIZE, Sort.Direction.DESC, "bestScore");
+        PageRequest pageRequest = new PageRequest(0, MAX_LEADERBOARD_SIZE, Sort.Direction.DESC, "bestScore");
         Page<Participation> topParticipation = participationRepository.findByCompetition_IdCompetition(idCompetition, pageRequest);
 
         AtomicInteger idx = new AtomicInteger();
@@ -110,16 +115,29 @@ public class CompetitionService {
     return savedCompetition.getIdCompetition();
   }
 
-  public Competition getCompetition(final Integer competitionId) {
-    return Optional.ofNullable(competitionRepository.findOne(competitionId))
-      .orElseThrow(() -> new CompetitionException("Could not find competition submission id: " + competitionId));
+  public Competition getActiveCompetitionById(final Integer competitionId) {
+    DateTime now = new DateTime();
+    return competitionRepository.findActiveByCompetitionId(competitionId, now)
+      .orElseThrow(() -> new CompetitionException("Could not find active competition with id: " + competitionId));
   }
 
+
+  private void checkIfUserCanParticipate(final Integer competitionId, final User user) {
+    participationService.getLastTakeDate(competitionId, user).ifPresent(LastTake -> {
+        DateTime nextAvailablePart = LastTake.plusMinutes(FREQUENCY_OF_PARTICIPATION_IN_MIN);
+        if (!nextAvailablePart.isBeforeNow()) {
+          throw new ParticipationException("You can send next submission after: " + nextAvailablePart.toString("MM/dd/yyyy HH:mm:ss z"));
+        }
+      }
+    );
+  }
   public void processSubmission(final MultipartFile file, final Integer competitionId) {
-    //TODO: only active
     try {
+      User user = userService.getCurrentLoggedUser();
+      checkIfUserCanParticipate(competitionId, user);
+
       Resource keyFile = storageService.loadFileAsResource(competitionId, FileLogicType.KEY);
-      Integer scoreFnId = getCompetition(competitionId).getScoreFnId();
+      Integer scoreFnId = getActiveCompetitionById(competitionId).getScoreFnId();
 
       CSVReader submissionCSVFile = new CSVReader(new InputStreamReader(file.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
       CSVReader keyCSVFile = new CSVReader(new InputStreamReader(keyFile.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
@@ -134,14 +152,35 @@ public class CompetitionService {
       }
 
       Double actualScore = scoreFor()
-        .submission(submissionList)
-        .and().key(keyList)
-        .withMetric(ScoreComputationService.ScoreFunctionType.find(scoreFnId));
+                          .submission(submissionList)
+                          .and().key(keyList)
+                          .withMetric(ScoreComputationService.ScoreFunctionType.find(scoreFnId));
 
-      participationService.saveParticipation(userService.getCurrentLoggedUser(), competitionId, actualScore);
+      participationService.updateParticipation(user, competitionId, actualScore);
     } catch (IOException ex) {
       log.error("while processing submission with file: {} for competition: {}, :", file.getOriginalFilename(), competitionId, ex);
       throw new InternalException("Calculating score for sent submission has failed.");
     }
+  }
+
+  public Collection<CompetitionCollectionDto> getAllCreatedCompetitionsForLoggedUser() {
+    return competitionRepository.findByUser(userService.getCurrentLoggedUser()).stream()
+      .map(CompetitionCollectionDto::new)
+      .collect(Collectors.toList());
+  }
+
+  public Collection<ManageCompetitionCollectionDto> getAllCompetitions() {
+    Collection<Competition> competitions = competitionRepository.findAll();
+
+    return competitions.stream()
+      .map(ManageCompetitionCollectionDto::new)
+      .collect(Collectors.toList());
+  }
+
+  public void deleteCompetition(final Integer id) {
+    if (competitionRepository.findOne(id) == null) {
+      throw new CompetitionException(String.format("Competition with id: %s does not exits", id));
+    }
+    competitionRepository.delete(id);
   }
 }

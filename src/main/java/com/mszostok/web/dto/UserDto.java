@@ -50,7 +50,7 @@ public class UserDto {
   @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
   private String password;
 
-  private boolean activated = false;
+  private boolean activated;
 
   private Set<String> authorities;
 
