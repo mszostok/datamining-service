@@ -40,7 +40,7 @@ public class HandleExceptionAdvice {
 
   @ResponseStatus(BAD_REQUEST)
   @ExceptionHandler({CompetitionException.class, UploadException.class, ParticipationException.class,
-    DescriptionException.class, SubmissionException.class, UserNotFoundException.class})
+                      DescriptionException.class, SubmissionException.class, UserNotFoundException.class})
   @ResponseBody
   ModelMap handleCompetitionException(final RuntimeException ex) {
     return new ModelMap().addAttribute("error", ex.getMessage());

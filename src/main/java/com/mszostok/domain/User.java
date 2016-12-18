@@ -56,9 +56,14 @@ public final class User {
   @Column(name = "country", nullable = false)
   private String country;
 
-
   @Column(name = "postal_code", nullable = false)
   private String postalCode;
+
+  @Column(name = "is_active", nullable = false)
+  private boolean active;
+
+  @Column(name = "is_deleted", nullable = false)
+  private boolean deleted;
 
   @OneToMany(cascade = ALL, mappedBy = "user")
   @JsonManagedReference
@@ -66,9 +71,6 @@ public final class User {
 
   @OneToMany(mappedBy = "user", cascade = ALL, fetch = LAZY)
   private List<Competition> competitions;
-
-  @Column(name = "is_active", nullable = false)
-  private boolean active;
 
   @Override
   public String toString() {
@@ -84,6 +86,7 @@ public final class User {
       .add("postalCode", postalCode)
       .add("roles", roles)
       .add("isActive", active)
+      .add("isDeleted", deleted)
       .toString();
   }
 }

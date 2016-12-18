@@ -88,12 +88,12 @@ public class UserService {
   }
 
   public boolean isUsernameInUse(final User actual, final UserDto update) {
-    return !update.getUsername().equals(actual.getUsername()) && userRepository.findOneByUsername(update.getUsername()).isPresent();
+    return !update.getUsername().equals(actual.getUsername()) && userRepository.findOneByUsernameAndDeletedFalse(update.getUsername()).isPresent();
   }
 
 
   public boolean isEmailInUse(final User actual, final UserDto update) {
-    return !update.getEmail().equals(actual.getEmail()) && userRepository.findOneByEmail(update.getEmail()).isPresent();
+    return !update.getEmail().equals(actual.getEmail()) && userRepository.findOneByEmailAndDeletedFalse(update.getEmail()).isPresent();
 
   }
 
@@ -122,11 +122,10 @@ public class UserService {
   }
 
   public void deleteUserById(final Integer id) {
-    if (userRepository.findOne(id) == null) {
-      throw new UserNotFoundException(String.format("User with id: %s does not exits", id));
-    }
-    userRepository.delete(id);
-
+    User user = Optional.of(userRepository.findOne(id))
+      .orElseThrow(() -> new UserNotFoundException(String.format("User with id: %s does not exits", id)));
+    user.setActive(false);
+    user.setDeleted(true);
   }
 
   public void setActiveById(final Integer id, final ManageActiveDto manageActiveDto) {

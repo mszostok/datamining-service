@@ -12,9 +12,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 import static javax.persistence.FetchType.LAZY;
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -45,6 +49,9 @@ public class Participation {
   @ManyToOne(fetch = LAZY)
   @JoinColumn(name = "competitions_id_competition")
   private Competition competition;
+
+  @OneToMany(mappedBy = "participation", cascade = ALL, fetch = LAZY)
+  private List<Submission> participationHistories;
 
   @Override
   public String toString() {

@@ -1,6 +1,7 @@
 package com.mszostok.service;
 
 import com.mszostok.enums.FileLogicType;
+import com.mszostok.model.StoredFile;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +18,8 @@ public interface StorageService {
   void storeTestingFile(MultipartFile file, Integer competitionId);
 
   void storeTrainingFile(MultipartFile file, Integer competitionId);
+
+  StoredFile storeSubmissionFile(MultipartFile file);
 
   Resource loadFileAsResource(Integer competitionId, FileLogicType type);
 }

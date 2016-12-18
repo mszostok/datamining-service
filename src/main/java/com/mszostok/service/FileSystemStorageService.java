@@ -5,6 +5,8 @@ import com.mszostok.configuration.AppConfig;
 import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.StorageException;
 import com.mszostok.exception.UploadException;
+import com.mszostok.model.StoredFile;
+import com.mszostok.repository.SubmissionRepository;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +46,14 @@ public class FileSystemStorageService implements StorageService {
   @Autowired
   private UploadService uploadService;
 
+  @Autowired
+  private SubmissionRepository participationHistoryRepo;
+
   private Function<YearMonth, String> getPathFromYearMonth = yearMonth -> {
     DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-      .parseCaseInsensitive()
-      .appendPattern("/yyyy/MM/")
-      .toFormatter(Locale.ENGLISH);
+                                        .parseCaseInsensitive()
+                                        .appendPattern("/yyyy/MM/")
+                                        .toFormatter(Locale.ENGLISH);
     return yearMonth.format(formatter);
   };
 
@@ -172,12 +177,34 @@ public class FileSystemStorageService implements StorageService {
       throw new StorageException("While storing file " + file.getOriginalFilename(), ex);
     }
   }
+
+  @Override
+  public StoredFile storeSubmissionFile(final MultipartFile file) {
+    try {
+      if (file.isEmpty()) {
+        log.info("Was uploaded empty file {}", file.getOriginalFilename());
+        throw new StorageException("Empty file " + file.getOriginalFilename());
+      }
+
+      Path dirName = createPathFor("submission");
+      String submissionFileUUID = UUID.randomUUID().toString();
+
+      Files.copy(file.getInputStream(), dirName.resolve(submissionFileUUID));
+
+      return new StoredFile(file.getOriginalFilename(), rootLocation.relativize(dirName) + "/" + submissionFileUUID);
+    } catch (IOException ex) {
+      log.error("While storing file: {}", ex);
+      throw new StorageException("While storing file " + file.getOriginalFilename(), ex);
+    }
+  }
+
+
   //
   //  @Override
 
   //  public Resource loadTrainingFileAsResource(final Integer competitionId) {
   //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TRAINING)
-  //      .map(upload -> loadAsResource(upload.getRefLink()))
+  //      .map(upload -> loadAsResource(upload.getFileRefLink()))
   //      .orElseThrow(() -> {
   //        log.warn("Could not find trainig file for competition submission rank: {} ", competitionId);
   //        return new UploadException("Could not find testing file for competition");
@@ -187,7 +214,7 @@ public class FileSystemStorageService implements StorageService {
   //  @Override
   //  public Resource loadTestingFileAsResource(final Integer competitionId) {
   //    return uploadService.getByCompetitionIdAndType(competitionId, FileLogicType.TESTING)
-  //      .map(upload -> loadAsResource(upload.getRefLink()))
+  //      .map(upload -> loadAsResource(upload.getFileRefLink()))
   //      .orElseThrow(() -> {
   //        log.warn("Could not find testing file for competition submission rank: {} ", competitionId);
   //        return new UploadException("Could not find testing file for competition");

@@ -31,4 +31,7 @@ public class CompetitionDto {
   private String datasetDescription;
   @NotNull
   private Integer scoreFnId;
+  @NotNull
+  private Integer allowParticipationFreqMin;
+
 }

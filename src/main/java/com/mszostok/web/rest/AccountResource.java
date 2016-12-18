@@ -53,24 +53,22 @@ public class AccountResource {
   @ApiResponses(value = {
         @ApiResponse(code = 201, message = "User created successful"),
         @ApiResponse(code = 400, message = "When validating issues occurred, more information will be described in response json"),
-        @ApiResponse(code = 500, message = "Something went wrong in Server")
-      })
+        @ApiResponse(code = 500, message = "Something went wrong in Server")})
   @RequestMapping(value = "/register", produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE}, method = POST)
   public ResponseEntity<?> registerAccount(@Valid @RequestBody final UserDto userDto) {
 
     HttpHeaders jsonHeaders = new HttpHeaders();
     jsonHeaders.setContentType(MediaType.APPLICATION_JSON);
 
-    return userRepository.findOneByEmail(userDto.getEmail().toLowerCase())
+    return userRepository.findOneByEmailAndDeletedFalse(userDto.getEmail().toLowerCase())
       .map(user -> new ResponseEntity<>(Collections.singletonMap("email", "E-mail address already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
       .orElseGet(() ->
-        userRepository.findOneByUsername(userDto.getUsername())
+        userRepository.findOneByUsernameAndDeletedFalse(userDto.getUsername())
           .map(user -> new ResponseEntity<>(Collections.singletonMap("username", "Username already in use"), jsonHeaders, HttpStatus.BAD_REQUEST))
           .orElseGet(() -> {
             User user = userService.createSimpleUser(userDto);
-            //TODO:
             String baseUrl = "template";
-            //mailService.sendActivationEmail(user, baseUrl);
+            mailService.sendActivationEmail(user, baseUrl);
             return new ResponseEntity<>(HttpStatus.CREATED);
           })
       );

@@ -11,12 +11,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 public interface CompetitionRepository extends JpaRepository<Competition, Integer> {
-  @Query("select c from Competition c where c.startDate <= :time and c.endDate >= :time")
+  @Query("select c from Competition c where c.deleted = false and c.startDate <= :time and c.endDate >= :time")
   Collection<Competition> findAllActive(@Param("time") DateTime time);
 
-  Collection<Competition> findByUser(User currentLoggedUser);
+  Collection<Competition> findByUserAndDeletedFalse(User currentLoggedUser);
 
 
-  @Query("select c from Competition c where c.startDate <= :time and c.endDate >= :time and c.idCompetition = :id")
+  @Query("select c from Competition c where c.deleted = false and c.startDate <= :time and c.endDate >= :time and c.idCompetition = :id")
   Optional<Competition> findActiveByCompetitionId(@Param("id") Integer competitionId, @Param("time") DateTime time);
 }

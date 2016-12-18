@@ -38,7 +38,7 @@ public class Competition {
   @Column(name = "name", nullable = false, length = 50)
   private String name;
 
-  @Column(name = "score_fn_id", nullable = false, length = 50)
+  @Column(name = "score_fn_id", nullable = false)
   private Integer scoreFnId;
 
   @Column(name = "short_desc", nullable = false, length = 255)
@@ -49,6 +49,12 @@ public class Competition {
 
   @Column(name = "end_date", nullable = false)
   private DateTime endDate;
+
+  @Column(name = "is_deleted", nullable = false)
+  private Boolean deleted;
+
+  @Column(name = "allow_participation_frequency_min", nullable = false)
+  private Integer allowParticipationFreqMin;
 
   @ManyToOne(fetch = LAZY)
   @JoinColumn(name = "users_id_user")

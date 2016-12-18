@@ -16,16 +16,16 @@ import java.util.stream.Collectors;
 public class ParticipationService {
 
   @Autowired
-  private ParticipationRepository participationRepository;
+  private ParticipationRepository participationRepo;
 
   @Autowired
-  private CompetitionService competitionService;
+  private CompetitionService competitionSvc;
 
   @Autowired
-  private UserService userService;
+  private UserService userSvc;
 
-  public Participation updateParticipation(final User user, final Integer competitionId, final Double score) {
-    return participationRepository.findOneByCompetition_IdCompetitionAndUser_IdUser(competitionId, user.getIdUser())
+  public Participation saveOrUpdateParticipation(final User user, final Integer competitionId, final Double score) {
+    return participationRepo.findOneByCompetition_IdCompetitionAndUser_IdUser(competitionId, user.getIdUser())
       .map(p -> {
         if (score > p.getBestScore())
           p.setBestScore(score);
@@ -34,29 +34,30 @@ public class ParticipationService {
         p.setLastTakeDate(DateTime.now());
         p.setLastScore(score);
         return p;
+
       })
       .orElseGet(() -> {
         Participation participation = new Participation();
 
-        participation.setCompetition(competitionService.getActiveCompetitionById(competitionId));
+        participation.setCompetition(competitionSvc.getActiveCompetitionById(competitionId));
         participation.setUser(user);
         participation.setLastTakeDate(DateTime.now());
         participation.setLastScore(score);
         participation.setBestScore(score);
         participation.setTakeNumber(1);
 
-        return participationRepository.save(participation);
+        return participationRepo.save(participation);
       });
   }
 
   public Collection<ParticipationDto> getAllParticipationForLoggedUser() {
-    return participationRepository.findByUser(userService.getCurrentLoggedUser()).stream()
+    return participationRepo.findByUser(userSvc.getCurrentLoggedUser()).stream()
       .map(ParticipationDto::new)
       .collect(Collectors.toList());
   }
 
   public Optional<DateTime> getLastTakeDate(final Integer competitionId, final User user) {
-    return participationRepository.findOneByCompetition_IdCompetitionAndUser_IdUser(competitionId, user.getIdUser())
+    return participationRepo.findOneByCompetition_IdCompetitionAndUser_IdUser(competitionId, user.getIdUser())
       .map(Participation::getLastTakeDate);
   }
 

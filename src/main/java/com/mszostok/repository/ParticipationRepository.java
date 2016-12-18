@@ -13,6 +13,7 @@ public interface ParticipationRepository extends JpaRepository<Participation, In
   Optional<Participation> findOneByCompetition_IdCompetitionAndUser_IdUser(Integer idCompetition, Integer idUser);
 
   Page<Participation> findByCompetition_IdCompetition(Integer idCompetition, Pageable pageable);
+  Collection<Participation> findByCompetition_IdCompetition(Integer idCompetition);
 
   Collection<Participation> findByUser(User currentLoggedUser);
 }

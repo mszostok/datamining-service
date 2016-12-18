@@ -51,6 +51,7 @@ public class UserDto {
   private String password;
 
   private boolean activated;
+  private boolean deleted;
 
   private Set<String> authorities;
 
@@ -58,10 +59,17 @@ public class UserDto {
   }
 
   public UserDto(final User user) {
-    this(user.getUsername(), user.getFirstName(), user.getLastName(), user.getEmail(), user.getCity(),
-      user.getCountry(), user.getPostalCode(), user.isActive(),
-      user.getRoles().stream().map(UserRole::getRole)
-        .collect(Collectors.toSet()));
+    this.username = user.getUsername();
+    this.firstName = user.getFirstName();
+    this.lastName = user.getLastName();
+    this.email = user.getEmail();
+    this.city = user.getCity();
+    this.country = user.getCountry();
+    this.postalCode = user.getPostalCode();
+    this.activated = user.isActive();
+    this.authorities = user.getRoles().stream().map(UserRole::getRole)
+      .collect(Collectors.toSet());
+    this.deleted = user.isDeleted();
   }
 
   public UserDto(final String username, final String firstName, final String lastName, final String email,

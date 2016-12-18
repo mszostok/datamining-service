@@ -2,8 +2,8 @@ package com.mszostok.service;
 
 import com.google.common.base.Charsets;
 import com.mszostok.domain.Competition;
-import com.mszostok.domain.Description;
 import com.mszostok.domain.Participation;
+import com.mszostok.domain.Submission;
 import com.mszostok.domain.User;
 import com.mszostok.enums.FileLogicType;
 import com.mszostok.exception.CompetitionException;
@@ -11,16 +11,20 @@ import com.mszostok.exception.InternalException;
 import com.mszostok.exception.ParticipationException;
 import com.mszostok.exception.SubmissionException;
 import com.mszostok.model.Member;
+import com.mszostok.model.StoredFile;
 import com.mszostok.repository.CompetitionRepository;
-import com.mszostok.repository.DescriptionRepository;
 import com.mszostok.repository.ParticipationRepository;
+import com.mszostok.repository.SubmissionRepository;
 import com.mszostok.web.dto.CompetitionCollectionDto;
+import com.mszostok.web.dto.CompetitionConfigureDto;
 import com.mszostok.web.dto.CompetitionDto;
 import com.mszostok.web.dto.CompetitionGeneralInfoDto;
 import com.mszostok.web.dto.ManageCompetitionCollectionDto;
 import com.opencsv.CSVReader;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.DateTime;
+import org.jsoup.Jsoup;
+import org.jsoup.safety.Whitelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -47,10 +51,10 @@ import static com.mszostok.service.ScoreComputationService.scoreFor;
 public class CompetitionService {
   public static final char CSV_SEPARATOR = ',';
   public static final int MAX_LEADERBOARD_SIZE = 10;
-  public static final int FREQUENCY_OF_PARTICIPATION_IN_MIN = 10; //TODO: env + default
+  public static final int FREQUENCY_OF_PARTICIPATION_IN_MIN = 1; //TODO: env + default
 
   @Autowired
-  private DescriptionRepository descriptionRepository;
+  private DescriptionService descriptionService;
 
   @Autowired
   private CompetitionRepository competitionRepository;
@@ -66,6 +70,10 @@ public class CompetitionService {
 
   @Autowired
   private ParticipationRepository participationRepository;
+
+  @Autowired
+  private SubmissionRepository submissionRepository;
+
 
   public Collection<CompetitionCollectionDto> getAllActiveCompetitions() {
     DateTime now = new DateTime();
@@ -94,23 +102,19 @@ public class CompetitionService {
   }
 
   public Integer save(final CompetitionDto competitionDto) {
-    //TODO: remove html
     Competition competition = new Competition();
     competition.setName(competitionDto.getName());
     competition.setEndDate(competitionDto.getEndDate());
     competition.setStartDate(competitionDto.getStartDate());
     competition.setScoreFnId(competitionDto.getScoreFnId());
-    competition.setShortDesc(competitionDto.getShortDescription());
+    competition.setShortDesc(Jsoup.clean(competitionDto.getShortDescription(), Whitelist.simpleText()));
     competition.setUser(userService.getCurrentLoggedUser());
+    competition.setAllowParticipationFreqMin(competitionDto.getAllowParticipationFreqMin());
+    competition.setDeleted(false);
 
     Competition savedCompetition = competitionRepository.save(competition);
 
-    Description description = new Description();
-    description.setIntroduction(competitionDto.getIntroductionDescription());
-    description.setFormula(competitionDto.getFormulaDescription());
-    description.setDataset(competitionDto.getDatasetDescription());
-    description.setCompetition(savedCompetition);
-    descriptionRepository.save(description);
+    descriptionService.save(competitionDto, competition);
 
     return savedCompetition.getIdCompetition();
   }
@@ -122,22 +126,35 @@ public class CompetitionService {
   }
 
 
-  private void checkIfUserCanParticipate(final Integer competitionId, final User user) {
-    participationService.getLastTakeDate(competitionId, user).ifPresent(LastTake -> {
-        DateTime nextAvailablePart = LastTake.plusMinutes(FREQUENCY_OF_PARTICIPATION_IN_MIN);
-        if (!nextAvailablePart.isBeforeNow()) {
-          throw new ParticipationException("You can send next submission after: " + nextAvailablePart.toString("MM/dd/yyyy HH:mm:ss z"));
+  private void checkIfUserCanParticipate(final Competition competition, final User user) {
+    participationService.getLastTakeDate(competition.getIdCompetition(), user).ifPresent(LastTake -> {
+          DateTime nextAvailablePart = LastTake.plusMinutes(competition.getAllowParticipationFreqMin());
+          if (!nextAvailablePart.isBeforeNow()) {
+            throw new ParticipationException("You can send next submission after: " + nextAvailablePart.toString("MM/dd/yyyy HH:mm:ss z"));
+          }
         }
-      }
     );
   }
+
+  private void saveSubmissionEntry(final MultipartFile file, final Participation participation, final Double actualScore) {
+    StoredFile storedFile = storageService.storeSubmissionFile(file);
+
+    Submission submission = new Submission();
+    submission.setOriginalFileName(storedFile.getFilename());
+    submission.setFileRefLink(storedFile.getRefLink());
+    submission.setScore(actualScore);
+    submission.setTakeDate(participation.getLastTakeDate());
+    submission.setParticipation(participation);
+    submissionRepository.save(submission);
+  }
+
   public void processSubmission(final MultipartFile file, final Integer competitionId) {
     try {
       User user = userService.getCurrentLoggedUser();
-      checkIfUserCanParticipate(competitionId, user);
+      Competition competition = getActiveCompetitionById(competitionId);
+      checkIfUserCanParticipate(competition, user);
 
       Resource keyFile = storageService.loadFileAsResource(competitionId, FileLogicType.KEY);
-      Integer scoreFnId = getActiveCompetitionById(competitionId).getScoreFnId();
 
       CSVReader submissionCSVFile = new CSVReader(new InputStreamReader(file.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
       CSVReader keyCSVFile = new CSVReader(new InputStreamReader(keyFile.getInputStream(), Charsets.UTF_8), CSV_SEPARATOR);
@@ -154,9 +171,10 @@ public class CompetitionService {
       Double actualScore = scoreFor()
                           .submission(submissionList)
                           .and().key(keyList)
-                          .withMetric(ScoreComputationService.ScoreFunctionType.find(scoreFnId));
+                          .withMetric(ScoreComputationService.ScoreFunctionType.find(competition.getScoreFnId()));
 
-      participationService.updateParticipation(user, competitionId, actualScore);
+      Participation participation = participationService.saveOrUpdateParticipation(user, competitionId, actualScore);
+      saveSubmissionEntry(file, participation, actualScore);
     } catch (IOException ex) {
       log.error("while processing submission with file: {} for competition: {}, :", file.getOriginalFilename(), competitionId, ex);
       throw new InternalException("Calculating score for sent submission has failed.");
@@ -164,7 +182,7 @@ public class CompetitionService {
   }
 
   public Collection<CompetitionCollectionDto> getAllCreatedCompetitionsForLoggedUser() {
-    return competitionRepository.findByUser(userService.getCurrentLoggedUser()).stream()
+    return competitionRepository.findByUserAndDeletedFalse(userService.getCurrentLoggedUser()).stream()
       .map(CompetitionCollectionDto::new)
       .collect(Collectors.toList());
   }
@@ -178,9 +196,27 @@ public class CompetitionService {
   }
 
   public void deleteCompetition(final Integer id) {
-    if (competitionRepository.findOne(id) == null) {
-      throw new CompetitionException(String.format("Competition with id: %s does not exits", id));
-    }
-    competitionRepository.delete(id);
+    Competition competition = Optional.ofNullable(competitionRepository.findOne(id))
+        .orElseThrow(() -> new CompetitionException(String.format("Competition with id: %s does not exits", id)));
+
+    competition.setDeleted(true);
+  }
+
+  public CompetitionConfigureDto getConfigureParamsForCompetition(final Integer competitionId) {
+    return Optional.ofNullable(competitionRepository.findOne(competitionId))
+      .map(CompetitionConfigureDto::new)
+      .orElseThrow(() -> new CompetitionException("Could not find competition with id: " + competitionId));
+  }
+
+  public void updateConfigureParams(final Integer competitionId, final CompetitionConfigureDto configureDto) {
+    Competition competition = Optional.ofNullable(competitionRepository.findOne(competitionId))
+        .orElseThrow(() -> new CompetitionException("Could not find competition with id: " + competitionId));
+
+    competition.setName(configureDto.getCompetitionName());
+    competition.setStartDate(configureDto.getStartDate());
+    competition.setEndDate(configureDto.getEndDate());
+    competition.setAllowParticipationFreqMin(configureDto.getAllowParticipationFreqMin());
+
+    competition.setShortDesc(Jsoup.clean(configureDto.getShortDescription(), Whitelist.simpleText()));
   }
 }
