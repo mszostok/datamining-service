@@ -8,8 +8,10 @@ import com.mszostok.service.DescriptionService;
 import com.mszostok.service.ScoreComputationService;
 import com.mszostok.service.StorageService;
 import com.mszostok.web.dto.CompetitionCollectionDto;
+import com.mszostok.web.dto.CompetitionConfigureDto;
 import com.mszostok.web.dto.CompetitionDto;
 import com.mszostok.web.dto.CompetitionGeneralInfoDto;
+import com.mszostok.web.dto.DescriptionDto;
 import com.mszostok.web.dto.ManageCompetitionCollectionDto;
 import com.mszostok.web.dto.ScoreFnDto;
 import io.swagger.annotations.Api;
@@ -39,9 +41,7 @@ import java.util.EnumSet;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpStatus.*;
-import static org.springframework.web.bind.annotation.RequestMethod.DELETE;
-import static org.springframework.web.bind.annotation.RequestMethod.GET;
-import static org.springframework.web.bind.annotation.RequestMethod.POST;
+import static org.springframework.web.bind.annotation.RequestMethod.*;
 
 
 @RestController
@@ -72,7 +72,7 @@ public class CompetitionResource {
     mapper.registerModule(new JodaModule());
   }
 
-  @ApiOperation(value = "Get all  competitions", response = CompetitionCollectionDto.class, responseContainer = "List")
+  @ApiOperation(value = "Get all competitions", response = CompetitionCollectionDto.class, responseContainer = "List")
   @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Something went wrong in Server")
       })
@@ -115,6 +115,28 @@ public class CompetitionResource {
     return competitionService.getGeneralInfoFor(competitionId);
   }
 
+  @ApiOperation(value = "Get configure params for competition")
+  @ApiResponses(value = {
+    @ApiResponse(code = 500, message = "Something went wrong in Server")
+  })
+  @ResponseStatus(OK)
+  @RequestMapping(value = "/{id}/configure", method = GET)
+  public CompetitionConfigureDto getConfigureParamsForCompetition(@PathVariable("id") final Integer competitionId) {
+    return competitionService.getConfigureParamsForCompetition(competitionId);
+  }
+
+  @ApiOperation(value = "Update configure param for competition")
+  @ApiResponses(value = {
+    @ApiResponse(code = 500, message = "Something went wrong in Server")
+  })
+  @ResponseStatus(NO_CONTENT)
+  @RequestMapping(value = "/{id}/configure", method = PUT)
+  public void updateConfigureParamsForCompetition(@PathVariable("id") final Integer competitionId,
+                                                  @Valid @RequestBody final CompetitionConfigureDto configureDto)  {
+    competitionService.updateConfigureParams(competitionId, configureDto);
+  }
+
+
   @ApiOperation(value = "Save competition")
   @ApiResponses(value = {
         @ApiResponse(code = 500, message = "Something went wrong in Server")
@@ -153,10 +175,22 @@ public class CompetitionResource {
         @ApiResponse(code = 200, message = "OK"),
         @ApiResponse(code = 500, message = "Something went wrong in Server")
       })
-  @RequestMapping(value = "/{id}/description/introduction", method = GET)
+  @RequestMapping(value = "/{id}/description/introduction", method = GET) //TODO: s/description/descriptions
   public ResponseEntity<?> getIntroductionForCompetition(@PathVariable("id") final Integer competitionId) {
     String text = descriptionService.getIntroductionFor(competitionId);
     return new ResponseEntity<>(Collections.singletonMap("text", text), OK);
+  }
+
+  @ApiOperation(value = "Update introduction description for requested competition")
+  @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "NO CONTENT"),
+        @ApiResponse(code = 500, message = "Something went wrong in Server")
+      })
+  @ResponseStatus(NO_CONTENT)
+  @RequestMapping(value = "/{id}/description/introduction", method = PUT) //TODO: s/description/descriptions
+  public void updateIntroductionForCompetition(@PathVariable("id") final Integer competitionId,
+                                               @Valid @RequestBody final DescriptionDto descriptionDto) {
+    descriptionService.updateIntroductionForCompetition(competitionId, descriptionDto);
   }
 
   @ApiOperation(value = "Get formula description for requested competition")
@@ -170,6 +204,18 @@ public class CompetitionResource {
     return new ResponseEntity<>(Collections.singletonMap("text", text), OK);
   }
 
+  @ApiOperation(value = "Update formula description for requested competition")
+  @ApiResponses(value = {
+        @ApiResponse(code = 204, message = "NO CONTENT"),
+        @ApiResponse(code = 500, message = "Something went wrong in Server")
+      })
+  @ResponseStatus(NO_CONTENT)
+  @RequestMapping(value = "/{id}/description/formula", method = PUT)
+  public void updateFormulaForCompetition(@PathVariable("id") final Integer competitionId,
+                                          @Valid @RequestBody final DescriptionDto descriptionDto) {
+    descriptionService.updateFormulaForCompetition(competitionId, descriptionDto);
+  }
+
   @ApiOperation(value = "Get dataset description for requested competition")
   @ApiResponses(value = {
         @ApiResponse(code = 200, message = "OK"),
@@ -179,6 +225,19 @@ public class CompetitionResource {
   public ResponseEntity<?> getDatasetDescriptionForCompetition(@PathVariable("id") final Integer competitionId) {
     String text = descriptionService.getDatasetFor(competitionId);
     return new ResponseEntity<>(Collections.singletonMap("text", text), OK);
+  }
+
+
+  @ApiOperation(value = "Update dataset description for requested competition")
+  @ApiResponses(value = {
+        @ApiResponse(code = 200, message = "OK"),
+        @ApiResponse(code = 500, message = "Something went wrong in Server")
+      })
+  @ResponseStatus(NO_CONTENT)
+  @RequestMapping(value = "/{id}/description/dataset", method = PUT)
+  public void updateDatasetDescriptionForCompetition(@PathVariable("id") final Integer competitionId,
+                                                     @Valid @RequestBody final DescriptionDto descriptionDto) {
+    descriptionService.updateDatasetForCompetition(competitionId, descriptionDto);
   }
 
   @ApiOperation(value = "Download training file for requested competition")

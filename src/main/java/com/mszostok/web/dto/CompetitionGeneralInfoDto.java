@@ -14,7 +14,8 @@ public class CompetitionGeneralInfoDto {
   private List<Member> leaderboard;
   private DateTime startDate;
   private DateTime endDate;
-  private String author;
+  private String username;
+  private String email;
 
   public CompetitionGeneralInfoDto() {
   }
@@ -22,7 +23,8 @@ public class CompetitionGeneralInfoDto {
   public CompetitionGeneralInfoDto(final Competition competition) {
     this.startDate = competition.getStartDate();
     this.endDate = competition.getEndDate();
-    this.author = competition.getUser().getUsername();
+    this.username = competition.getUser().getUsername();
+    this.email = competition.getUser().getEmail();
   }
 
 

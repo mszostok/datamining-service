@@ -5,17 +5,19 @@
     "version" : "\"v1\"",
     "title" : "Data Mining Competition"
   },
-  "host" : "http://custom-env.dudjzicpak.eu-west-1.elasticbeanstalk.com/",
+  "host" : "localhost:8081",
   "basePath" : "/api",
   "tags" : [ {
     "name" : "competitions",
     "description" : "Operations about competitions"
   }, {
-    "name" : "register"
+    "name" : "register",
+    "description" : "Operations about user registration"
   }, {
     "name" : "user : Operations about user"
   }, {
-    "name" : "auth : Operation about authentication"
+    "name" : "auth",
+    "description" : "Operations about authentication"
   } ],
   "schemes" : [ "http", "https" ],
   "paths" : {
@@ -59,7 +61,60 @@
         }
       }
     },
+    "/change-password" : {
+      "put" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Change player password",
+        "description" : "",
+        "operationId" : "changePassForLoggedUser",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/PasswordRequest"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "object"
+            }
+          },
+          "400" : {
+            "description" : "Validation error, more information will be provided in sent JSON"
+          },
+          "404" : {
+            "description" : "User not found"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
+          }
+        }
+      }
+    },
     "/competitions" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get all  competitions",
+        "description" : "",
+        "operationId" : "getAllCompetitions",
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/CompetitionCollectionDto"
+              }
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
       "post" : {
         "tags" : [ "competitions" ],
         "summary" : "Save competition",
@@ -89,7 +144,7 @@
     "/competitions/active" : {
       "get" : {
         "tags" : [ "competitions" ],
-        "summary" : "Get all active competition",
+        "summary" : "Get all active competitions",
         "description" : "",
         "operationId" : "getAllActiveCompetitions",
         "responses" : {
@@ -104,6 +159,59 @@
           },
           "500" : {
             "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/created" : {
+      "get" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Get all created competitions name",
+        "description" : "",
+        "operationId" : "getAllCreatedCompetitions",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/CompetitionCollectionDto"
+              }
+            }
+          },
+          "404" : {
+            "description" : "User not found"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/participation" : {
+      "get" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Get all competitions that user participate",
+        "description" : "",
+        "operationId" : "getAllParticipation",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/ParticipationDto"
+              }
+            }
+          },
+          "400" : {
+            "description" : "Validation error, more information will be provided in sent JSON"
+          },
+          "404" : {
+            "description" : "User not found"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
           }
         }
       }
@@ -126,6 +234,29 @@
           },
           "500" : {
             "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/competitions/{id}" : {
+      "delete" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Delete competition by id. You will need to have admin scope",
+        "description" : "",
+        "operationId" : "deleteCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
           }
         }
       }
@@ -375,7 +506,7 @@
     "/profile" : {
       "get" : {
         "tags" : [ "user : Operations about user" ],
-        "summary" : "Get all available score functions",
+        "summary" : "Get profile",
         "description" : "",
         "operationId" : "getProfile",
         "produces" : [ "application/json" ],
@@ -393,7 +524,7 @@
       },
       "put" : {
         "tags" : [ "user : Operations about user" ],
-        "summary" : "Get all available score functions",
+        "summary" : "Update profile",
         "description" : "",
         "operationId" : "updateProfile",
         "produces" : [ "application/json", "text/plain" ],
@@ -409,13 +540,10 @@
           "200" : {
             "description" : "successful operation",
             "schema" : {
-              "type" : "array",
-              "items" : {
-                "$ref" : "#/definitions/ScoreFnDto"
-              }
+              "type" : "object"
             }
           },
-          "404" : {
+          "400" : {
             "description" : "Validation error, more information will be provided in sent json"
           },
           "500" : {
@@ -426,7 +554,7 @@
     },
     "/register" : {
       "post" : {
-        "tags" : [ "register" ],
+        "tags" : [ "register : Operations about registering user" ],
         "summary" : "Register new user",
         "description" : "",
         "operationId" : "registerAccount",
@@ -449,11 +577,86 @@
           "201" : {
             "description" : "User created successful"
           },
-          "404" : {
+          "400" : {
             "description" : "When validating issues occurred, more information will be described in response json"
           },
           "500" : {
             "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/users" : {
+      "get" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Get all users. You will need to have admin scope",
+        "description" : "",
+        "operationId" : "getAllUsers",
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/definitions/ManageUserDto"
+              }
+            }
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
+          }
+        }
+      }
+    },
+    "/users/{id}" : {
+      "delete" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Delete user by id. You will need to have admin scope",
+        "description" : "",
+        "operationId" : "deleteUser",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
+          }
+        }
+      }
+    },
+    "/users/{id}/active" : {
+      "put" : {
+        "tags" : [ "user : Operations about user" ],
+        "summary" : "Update isActive state for user. You will need to have admin scope",
+        "description" : "",
+        "operationId" : "setActive",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/ManageActiveDto"
+          }
+        }, {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "500" : {
+            "description" : "Something wrong in Server"
           }
         }
       }
@@ -601,6 +804,15 @@
     "InputStream" : {
       "type" : "object"
     },
+    "ManageActiveDto" : {
+      "type" : "object",
+      "properties" : {
+        "isActive" : {
+          "type" : "boolean",
+          "default" : false
+        }
+      }
+    },
     "Member" : {
       "type" : "object",
       "required" : [ "rank" ],
@@ -610,6 +822,17 @@
           "format" : "int32"
         },
         "username" : {
+          "type" : "string"
+        }
+      }
+    },
+    "PasswordRequest" : {
+      "type" : "object",
+      "properties" : {
+        "oldPassword" : {
+          "type" : "string"
+        },
+        "newPassword" : {
           "type" : "string"
         }
       }
@@ -628,6 +851,9 @@
           "type" : "boolean",
           "default" : false
         },
+        "filename" : {
+          "type" : "string"
+        },
         "description" : {
           "type" : "string"
         },
@@ -638,9 +864,6 @@
         "readable" : {
           "type" : "boolean",
           "default" : false
-        },
-        "filename" : {
-          "type" : "string"
         },
         "inputStream" : {
           "$ref" : "#/definitions/InputStream"

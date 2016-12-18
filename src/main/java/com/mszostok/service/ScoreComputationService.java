@@ -45,7 +45,7 @@ public class ScoreComputationService {
     }
 
     private static class Holder {
-      final static Map<Integer, ScoreFunctionType> MAP = new HashMap<>();
+      static final Map<Integer, ScoreFunctionType> MAP = new HashMap<>();
     }
 
   }

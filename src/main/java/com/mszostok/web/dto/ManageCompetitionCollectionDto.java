@@ -9,11 +9,12 @@ import lombok.Setter;
 public class ManageCompetitionCollectionDto extends CompetitionCollectionDto {
   private String startDate;
   private String endDate;
-  private Integer participationNumber;
+  private Boolean deleted;
 
   public ManageCompetitionCollectionDto(final Competition competition) {
     super(competition);
     this.startDate = competition.getStartDate().toString("MM/dd/yyyy HH:mm:ss");
     this.endDate = competition.getEndDate().toString("MM/dd/yyyy HH:mm:ss");
+    this.deleted = competition.getDeleted();
   }
 }

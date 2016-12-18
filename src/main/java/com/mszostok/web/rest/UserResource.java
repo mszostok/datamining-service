@@ -68,9 +68,8 @@ public class UserResource {
 
   @ApiOperation(value = "Update profile")
   @ApiResponses(value = {
-    @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent json"),
-    @ApiResponse(code = 500, message = "Something went wrong in Server")
-  })
+      @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent json"),
+      @ApiResponse(code = 500, message = "Something went wrong in Server")})
   @RequestMapping(value = "/profile", method = PUT, produces = {APPLICATION_JSON_VALUE, TEXT_PLAIN_VALUE})
   public ResponseEntity<?> updateProfile(@Valid @RequestBody final UserDto userDto) {
 
@@ -95,8 +94,7 @@ public class UserResource {
 
   @ApiOperation(value = "Get profile", response = UserDto.class)
   @ApiResponses(value = {
-    @ApiResponse(code = 500, message = "Something went wrong in Server")
-  })
+        @ApiResponse(code = 500, message = "Something went wrong in Server")})
   @RequestMapping(value = "/profile", method = GET, produces = APPLICATION_JSON_VALUE)
   public ResponseEntity<UserDto> getProfile() {
 
@@ -108,9 +106,9 @@ public class UserResource {
 
   @ApiOperation(value = "Change player password")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
-    @ApiResponse(code = 404, message = "User not found"),
-    @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent JSON"),
-    @ApiResponse(code = 500, message = "Something wrong in Server")})
+        @ApiResponse(code = 404, message = "User not found"),
+        @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent JSON"),
+        @ApiResponse(code = 500, message = "Something wrong in Server")})
   @RequestMapping(value = "/change-password", method = PUT)
   public ResponseEntity<?> changePassForLoggedUser(@Valid @RequestBody final PasswordRequest passReq) {
     User user = userService.getCurrentLoggedUser();
@@ -124,9 +122,9 @@ public class UserResource {
 
   @ApiOperation(value = "Get all competitions that user participate")
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
-    @ApiResponse(code = 404, message = "User not found"),
-    @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent JSON"),
-    @ApiResponse(code = 500, message = "Something wrong in Server")})
+        @ApiResponse(code = 404, message = "User not found"),
+        @ApiResponse(code = 400, message = "Validation error, more information will be provided in sent JSON"),
+        @ApiResponse(code = 500, message = "Something wrong in Server")})
   @RequestMapping(value = "competitions/participation", method = GET)
   public Collection<ParticipationDto> getAllParticipation() {
     return participationService.getAllParticipationForLoggedUser();

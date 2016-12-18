@@ -10,6 +10,9 @@ public class ScoreFnDto {
   private Integer id;
   private String name;
 
+  public ScoreFnDto() {
+  }
+
   public ScoreFnDto(final ScoreComputationService.ScoreFunctionType scoreFunctionType) {
     this.id = scoreFunctionType.getId();
     this.name = scoreFunctionType.getName();

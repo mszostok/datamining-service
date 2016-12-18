@@ -14,6 +14,7 @@ public class ScoreComputation {
         points.incrementAndGet();
       }
     });
-    return points.doubleValue();
+
+    return (points.doubleValue() * 100) / keyList.size();
   }
 }

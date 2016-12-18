@@ -19,6 +19,9 @@ public class ParticipationDto {
   @NotNull
   private Double bestScore;
 
+  public ParticipationDto() {
+  }
+
   public ParticipationDto(final Participation participation) {
     this.competitionId = participation.getCompetition().getIdCompetition();
     this.competitionName = participation.getCompetition().getName();

@@ -9,6 +9,9 @@ import lombok.Setter;
 public class ManageUserDto extends UserDto {
   private Integer id;
 
+  public ManageUserDto() {
+  }
+
   public ManageUserDto(final User user) {
     super(user);
     this.id = user.getIdUser();
