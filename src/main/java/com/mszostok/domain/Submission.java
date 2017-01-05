@@ -22,12 +22,12 @@ import static javax.persistence.GenerationType.SEQUENCE;
 @Getter
 @Setter
 @EqualsAndHashCode
-@Table(name = "participation_history", schema = "public")
+@Table(name = "participation_histories", schema = "public")
 public class Submission {
 
   @Id
-  @GeneratedValue(strategy = SEQUENCE, generator = "participation_history_id_participation_history_seq")
-  @SequenceGenerator(name = "participation_history_id_participation_history_seq", sequenceName = "participation_history_id_participation_history_seq", allocationSize = 1)
+  @GeneratedValue(strategy = SEQUENCE, generator = "participation_histories_id_participation_history_seq")
+  @SequenceGenerator(name = "participation_histories_id_participation_history_seq", sequenceName = "participation_histories_id_participation_history_seq", allocationSize = 1)
   @Column(name = "id_participation_history", nullable = false, unique = true)
   private int idParticipationHistory;
 

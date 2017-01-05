@@ -5,7 +5,7 @@
     "version" : "\"v1\"",
     "title" : "Data Mining Competition"
   },
-  "host" : "localhost:8081",
+  "host" : "custom-env.sipk6cgpfa.eu-central-1.elasticbeanstalk.com",
   "basePath" : "/api",
   "tags" : [ {
     "name" : "competitions",
