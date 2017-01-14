@@ -8,16 +8,17 @@
   "host" : "custom-env.sipk6cgpfa.eu-central-1.elasticbeanstalk.com",
   "basePath" : "/api",
   "tags" : [ {
+    "name" : "auth",
+    "description" : "Auth operations"
+  }, {
     "name" : "competitions",
     "description" : "Operations about competitions"
   }, {
-    "name" : "register",
-    "description" : "Operations about user registration"
+    "name" : "mailing : Operations about mailing"
+  }, {
+    "name" : "register : Operations about registering user"
   }, {
     "name" : "user : Operations about user"
-  }, {
-    "name" : "auth",
-    "description" : "Operations about authentication"
   } ],
   "schemes" : [ "http", "https" ],
   "paths" : {
@@ -34,15 +35,13 @@
             "in": "formData",
             "name": "email",
             "type": "string",
-            "required": true,
-            "allowMultiple": false
+            "required": true
           },
           {
             "in": "formData",
             "name": "password",
             "type": "string",
-            "required": true,
-            "allowMultiple": false
+            "required": true
           }
         ],
         "consumes": [
@@ -57,6 +56,33 @@
           },
           "500": {
             "description": "Something wrong in Server."
+          }
+        }
+      }
+    },
+    "/auth/token" : {
+      "get" : {
+        "tags" : [ "auth" ],
+        "summary" : "Get new token & refresh token",
+        "description" : "",
+        "operationId" : "refreshToken",
+        "produces" : [ "application/json" ],
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "required" : true,
+          "type" : "string",
+          "default" : ""
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK",
+            "schema" : {
+              "$ref" : "#/definitions/TokenMap"
+            }
+          },
+          "500" : {
+            "description" : "Something wrong in Server."
           }
         }
       }
@@ -97,7 +123,7 @@
     "/competitions" : {
       "get" : {
         "tags" : [ "competitions" ],
-        "summary" : "Get all  competitions",
+        "summary" : "Get all competitions",
         "description" : "",
         "operationId" : "getAllCompetitions",
         "responses" : {
@@ -261,6 +287,57 @@
         }
       }
     },
+    "/competitions/{id}/configure" : {
+      "get" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Get configure params for competition",
+        "description" : "",
+        "operationId" : "getConfigureParamsForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "successful operation",
+            "schema" : {
+              "$ref" : "#/definitions/CompetitionConfigureDto"
+            }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Update configure param for competition",
+        "description" : "",
+        "operationId" : "updateConfigureParamsForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/CompetitionConfigureDto"
+          }
+        } ],
+        "responses" : {
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
     "/competitions/{id}/dataset/testing" : {
       "get" : {
         "tags" : [ "competitions" ],
@@ -268,7 +345,7 @@
         "description" : "",
         "operationId" : "serveTestingFile",
         "parameters" : [ {
-          "name" : "",
+          "name" : "id",
           "in" : "path",
           "required" : true,
           "type" : "integer",
@@ -297,7 +374,7 @@
           "required" : true,
           "type" : "ref"
         }, {
-          "name" : "",
+          "name" : "file",
           "in" : "formData",
           "required" : true,
           "type" : "file"
@@ -322,7 +399,7 @@
         "description" : "",
         "operationId" : "serveTrainingFile",
         "parameters" : [ {
-          "name" : "",
+          "name" : "id",
           "in" : "path",
           "required" : true,
           "type" : "integer",
@@ -393,6 +470,34 @@
             "description" : "Something went wrong in Server"
           }
         }
+      },
+      "put" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Update dataset description for requested competition",
+        "description" : "",
+        "operationId" : "updateDatasetDescriptionForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DescriptionDto"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "OK"
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
       }
     },
     "/competitions/{id}/description/formula" : {
@@ -419,6 +524,34 @@
             "description" : "Something went wrong in Server"
           }
         }
+      },
+      "put" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Update formula description for requested competition",
+        "description" : "",
+        "operationId" : "updateFormulaForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DescriptionDto"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "NO CONTENT"
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
       }
     },
     "/competitions/{id}/description/introduction" : {
@@ -440,6 +573,34 @@
             "schema" : {
               "type" : "object"
             }
+          },
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "competitions" ],
+        "summary" : "Update introduction description for requested competition",
+        "description" : "",
+        "operationId" : "updateIntroductionForCompetition",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "type" : "integer",
+          "format" : "int32"
+        }, {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/DescriptionDto"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "NO CONTENT"
           },
           "500" : {
             "description" : "Something went wrong in Server"
@@ -497,6 +658,30 @@
           "format" : "int32"
         } ],
         "responses" : {
+          "500" : {
+            "description" : "Something went wrong in Server"
+          }
+        }
+      }
+    },
+    "/emails/send-async" : {
+      "post" : {
+        "tags" : [ "mailing : Operations about mailing" ],
+        "summary" : "Send email for all participants",
+        "description" : "",
+        "operationId" : "sendEmailToParticipants",
+        "parameters" : [ {
+          "in" : "body",
+          "name" : "body",
+          "required" : false,
+          "schema" : {
+            "$ref" : "#/definitions/SendEmailDto"
+          }
+        } ],
+        "responses" : {
+          "202" : {
+            "description" : "ACCEPTED"
+          },
           "500" : {
             "description" : "Something went wrong in Server"
           }
@@ -687,9 +872,33 @@
         }
       }
     },
+    "CompetitionConfigureDto" : {
+      "type" : "object",
+      "properties" : {
+        "startDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "endDate" : {
+          "type" : "string",
+          "format" : "date-time"
+        },
+        "shortDescription" : {
+          "type" : "string"
+        },
+        "competitionName" : {
+          "type" : "string"
+        },
+        "allowParticipationFreqMin" : {
+          "type" : "integer",
+          "format" : "int32",
+          "minimum" : 0.0
+        }
+      }
+    },
     "CompetitionDto" : {
       "type" : "object",
-      "required" : [ "endDate", "scoreFnId", "startDate" ],
+      "required" : [ "allowParticipationFreqMin", "endDate", "scoreFnId", "startDate" ],
       "properties" : {
         "name" : {
           "type" : "string",
@@ -719,6 +928,10 @@
         "scoreFnId" : {
           "type" : "integer",
           "format" : "int32"
+        },
+        "allowParticipationFreqMin" : {
+          "type" : "integer",
+          "format" : "int32"
         }
       }
     },
@@ -739,7 +952,18 @@
           "type" : "string",
           "format" : "date-time"
         },
-        "author" : {
+        "username" : {
+          "type" : "string"
+        },
+        "email" : {
+          "type" : "string"
+        }
+      }
+    },
+    "DescriptionDto" : {
+      "type" : "object",
+      "properties" : {
+        "body" : {
           "type" : "string"
         }
       }
@@ -851,15 +1075,15 @@
           "type" : "boolean",
           "default" : false
         },
-        "filename" : {
-          "type" : "string"
-        },
         "description" : {
           "type" : "string"
         },
         "uri" : {
           "type" : "string",
           "format" : "uri"
+        },
+        "filename" : {
+          "type" : "string"
         },
         "readable" : {
           "type" : "boolean",
@@ -878,6 +1102,29 @@
           "format" : "int32"
         },
         "name" : {
+          "type" : "string"
+        }
+      }
+    },
+    "SendEmailDto" : {
+      "type" : "object",
+      "properties" : {
+        "competitionId" : {
+          "type" : "integer",
+          "format" : "int32"
+        },
+        "body" : {
+          "type" : "string"
+        }
+      }
+    },
+    "TokenMap" : {
+      "type" : "object",
+      "properties" : {
+        "token" : {
+          "type" : "string"
+        },
+        "refreshToken" : {
           "type" : "string"
         }
       }
