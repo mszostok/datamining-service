@@ -1,17 +1,19 @@
 language: java
 jdk:
-  - oraclejdk8
+- oraclejdk8
 sudo: false
 script: mvn clean package
 deploy:
   on:
-      branch: develop
+    branch: develop
   skip_cleanup: true
   provider: elasticbeanstalk
-  access-key-id: AKIAIOLTGUTBUJEL6NNA
-  secret-access-key: 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
+  access-key-id:
+    secure: Hyq2zHc7yoP0rP3S2Xy0ToU38cNZkjsm0RXroNjO6cmRzytLmGT0dL1RdRvQTEmo3HDN7LLmTA8psPmgD0OjKhEG5Bibg9+pmKvDDUY24wGEsrYjTCfxb2HppE+eY6fJKxre8YXCoC/+5ZIM1gFgX7l9WwBQasxVi8R9Q64H3WV9ZM5X8cZDqWuatJJ/bE/XwNFYsFtiNcf6qoxC88WLXOFqjBQPVXASyNIoczYBSMpFEBDCqclmIAwsNa7ktZZReqd3duuSfCDQm3TG5RB+X6Tx4TqECvF/oxpt6pGMZZ8WCDW9SDc6m9YBCFR5Bh0n8+VqjkWzv6eUkpmKSCJUsaOyadYS4Uf//SI97OXePOhDx5AZ2Vz+NiU+pukl6dYnbR/J50V+BZSZ7IUyaioMD996/d0cm3ueV8iV2UQU2dN+RdPMxYAEvBSxcyyRvEuJgPIqK51ujtpQugRjVf1iqqRHgSo1ZOVmb9F+bm2FJWuCQFje4ygeP8wSak6bSNdF2ZQfCbwsYt35XbW6IQMFm+AyP2bEwd1/tWLItAvlsJMclvQUlK1Y1HbUthYbHuPltu71V0SXCG2bm5HuJbPATHWI95FZSLfIvK+yjIDHnz3UNJLPIorYPGHRmdjeHJOZ2xXkOsYM1MVuKaZVDFQ4+OLWI90gI7dIyL9zNr3QZuM=
+  secret-access-key:
+    secure: AfjYeMk3z52krr+jPplcRuPpQxs7/3oUb9Fzzv6rGFZ3Kz4Tg1DgY8unyFH7UvboQi/8tz3Z0hsVoPeZdvshXLn9R68RXUUdytEIJ6IuqICY+vgMOGCwWjnW9rOzEVDp65bxS5hbQ7BbC9008amCIH/yUrsLsposC4tPERJw510ybQx0BxFcrYJpJESmefcHZUXlycYzLyO1oSsFNGAFRllyo9BytPPmfEjsT8p8BGZwHE+ftk0R0A9QfhyiVB++CUo8+wLWCs7lCPw0piROF3yyQFpWrD/6W94rvYLy7b0sl6Qs/u6S7Y2j5u/6+R8cS623x0S+FumhCxDYpAqwJrzFvfZV2hCfJkJxNjLVRSiMIz0KaUVeHCy5eysxA7nTQT/q5eGXCyiNyxNMgPpogNRegdjiPVYGlwhHlK6f+9y0vGWwaHWDmhxJAEmhRYivuEvztOeMN7NBEDRY/nIBRYg1GuSatS7GLLLLAaXn3rn9FgO9FIqMZVmTyLxUdYiJn3cScFWasX5NCkco4pAKCu5DhDQ52QjCX9k1MsfW4pIQ4gIZ6w+wo9iqIF3YoNZ83T7eRUmKbd4rtYVhnO7BxoU+SZGYOq1WxJjIIWvYDZGpc2rBsxGf+87Gl/0miv6XloJL/jboR0c8dZIZJgAVMCJ/kT7GlbVqvIHnFXedS4E=
   region: eu-central-1
   app: dataminig-service
   env: Custom-env
   bucket_name: elasticbeanstalk-eu-central-1-322930184898
-  zip_file: '/target/backend-project.zip'
+  zip_file: "/target/backend-project.zip"
