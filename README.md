@@ -1,20 +1,10 @@
-<img src="https://zeroc.com/images/logos/languages/java-b48c6193e3.svg" width="48">
 <img src="http://fruzenshtein.com/wp-content/uploads/2013/04/Spring-Security-logo.png" width="48">
 <img src="http://engineer.recruit-lifestyle.co.jp/techblog/2015-10-02-spring-3mins/img/article_main.png" width="48">
 <img src="https://getsandbox.com/lib/img/logo-swagger.png" width="48">
 
-## Data mining competition web services [![Build Status](https://travis-ci.com/mszostok/inz-backend.svg?token=ccfxHqCjsJPxse56s5pp&branch=develop)](https://travis-ci.com/mszostok/inz-backend)
+## Data mining competition web services
 
-[View Live Demo](http://custom-env.sipk6cgpfa.eu-central-1.elasticbeanstalk.com/api/index.html "Service REST API")
-
-###Feature:
-+ TBD
-
-
-## Usage and setup
-
-TBD
-
+This repository contains source code for the data mining service which I created for BSc Thesis. It's similar to [Kaggle](https://www.kaggle.com/). This project is not developed nor maintained.
 
 # License
 
